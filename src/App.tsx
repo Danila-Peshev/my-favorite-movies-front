@@ -11,11 +11,11 @@ function App() {
       <div className="my-10 w-11/12 mx-auto">
         <div className="flex flex-col mx-auto">
           <label className="left">Имя пользователя или e-mail</label>
-          <input type="text" className="border border-neutral-300 shadow-sm h-10"></input>
+          <input type="text" className="border border-neutral-300 shadow-sm h-10 text-lg"></input>
         </div>
         <div className="flex flex-col mx-auto my-5">
           <label>Пароль</label>
-          <input type="password" className="border border-neutral-300 shadow-sm h-10"></input>
+          <input type="password" className="border border-neutral-300 shadow-sm h-10 text-2xl"></input>
         </div>
         <div className="flex relative my-10">
             <label><input 
