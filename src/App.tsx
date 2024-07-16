@@ -1,13 +1,14 @@
 import { useState } from "react";
+import logo from "./components/assets/1.jpg"
 
 function App() {
   const [checked, setChecked] = useState(false);
-  // localStorage.setItem('email', 'example@gmail.com')
-  // localStorage.setItem('password', 'OBvabp9egp-=18((&_8**Y99v7-')
-
   return (
-    <div className="h-96 w-1/4 bg-white border border-teal-200 shadow-xl mt-60 mx-auto">
-      <div className="my-10 w-4/5 mx-auto">
+    <>
+    <div className="w-1/4 mt-20 mx-auto">
+    <img src={logo} className="mx-auto size-40 mb-10 rounded-full"></img>
+    <div className="h-80 bg-white border border-teal-200 shadow-xl">
+      <div className="my-10 w-11/12 mx-auto">
         <div className="flex flex-col mx-auto">
           <label className="left">Имя пользователя или e-mail</label>
           <input type="text" className="border border-neutral-300 shadow-sm h-10"></input>
@@ -16,17 +17,23 @@ function App() {
           <label>Пароль</label>
           <input type="password" className="border border-neutral-300 shadow-sm h-10"></input>
         </div>
-        <div className="">
+        <div className="flex relative my-10">
             <label><input 
               type="checkbox" 
               checked={checked} 
-              onChange={() => setChecked(!checked)}>
+              onChange={() => setChecked(!checked)}
+              className="size-5 rounded-none border-none border-neutral-300 mr-4">
             </input>Запомнить меня</label>
-            <button className="bg-blue-500 h-10 w-20 radius rounded text-white">Войти</button>
+            <div className="grow"></div>
+            <button className="bg-blue-500 h-10 w-20 rounded text-white">Войти</button>
         </div>
       </div>
-        <a href="#">Забыли пароль?</a>
     </div>
+    <div className="mt-5">
+      <a href="#" className="ml-5">Забыли пароль?</a>
+    </div>
+    </div>
+    </>
   );
 }
 
