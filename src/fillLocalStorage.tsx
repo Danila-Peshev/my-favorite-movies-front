@@ -20,7 +20,6 @@ const Users = [
 ]
 
 export function fillLocalStorage() {
-    localStorage.clear();
     if (!localStorage.getItem("users")) {
         localStorage.setItem("users", JSON.stringify(Users));
     }
