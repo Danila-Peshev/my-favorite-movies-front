@@ -1,70 +1,92 @@
-import { useContext, useState } from 'react';
-import logo from "../../assets/logo.png"
-import { Context } from '../..';
-import { observer } from 'mobx-react-lite';
+import logo from "../../assets/logo/logo.png"
+import { useAuth } from '../../components/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Field, Form } from 'react-final-form';
+import { FORM_ERROR } from 'final-form';
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { store } = useContext(Context);
-  const [checked, setChecked] = useState(false);
-  const [messageInputFields, setMessageInputFields] = useState("");
+const Login = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
-  function handleClick() {
-    const result = store.login(email, password);
-    if (result.error) {
-      setMessageInputFields(result.error);
-    } else {
-      const from = location.state?.from?.pathname || "/";
-      navigate(from, { replace: true });
+  const onSubmit = async (values: { email: any; password: any; }) => {
+    const { email, password } = values;
+    if (!email || !password) {
+      return { email: t("input-error-empty"), password: t("input-error-empty") };
     }
-  }
+    const success = await login(email, password);
+    if (success) {
+      const redirectTo = location.state?.from || "/";
+      navigate(redirectTo, { replace: true });
+    } else {
+      return { [FORM_ERROR]: t("input-error-failed") };
+    }
+  };
 
   return (
     <div className="w-1/4 mt-20 mx-auto">
-      <img src={logo} className="mx-auto size-40 mb-10 rounded-full"></img>
-      <div className="h-80 bg-white border border-zinc-500 shadow-xl rounded">
+      <img src={logo} className="mx-auto size-40 mb-10 rounded-full" alt='logo' />
+      <div className="h-80 bg-white border border-blue-200 shadow-xl shadow-blue-200 rounded">
         <div className="my-10 w-11/12 mx-auto">
-          <div className="flex flex-col mx-auto">
-            <label className="left">Имя пользователя или e-mail</label>
-            <input
-              value={email}
-              onChange={(e) => { setEmail(e.target.value) }}
-              type="text"
-              className="border border-neutral-300 shadow-sm h-10 text-lg"></input>
-          </div>
-          <div className="flex flex-col mx-auto my-5">
-            <label>Пароль</label>
-            <input
-              value={password}
-              onChange={(e) => { setPassword(e.target.value) }}
-              type="password"
-              className="border border-neutral-300 shadow-sm h-10 text-2xl"></input>
-            <p className='text-red-500 font-semibold'>{messageInputFields}</p>
-          </div>
-          <div className="flex relative mb-10 items-center">
-            <input
-              type="checkbox"
-              checked={checked}
-              onChange={() => setChecked(!checked)}
-              className="size-5 rounded-none border-none border-neutral-300 mr-4">
-            </input>
-            <label>Запомнить меня</label>
-            <div className="grow"></div>
-            <button
-              onClick={handleClick}
-              className="bg-blue-500 h-10 w-20 rounded text-white hover:bg-white hover:text-black hover:border hover:border-black">Войти</button>
-          </div>
+          <Form
+            onSubmit={onSubmit}
+            render={({ handleSubmit, submitError }) => (
+              <form onSubmit={handleSubmit}>
+                <div className="flex flex-col mx-auto">
+                  <label className="left">{t("input-email")}</label>
+                  <Field name="email">
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="text"
+                          className="border border-blue-200 shadow-sm h-10 text-lg w-full"
+                        />
+                        {meta.touched && meta.error && (
+                          <span className="text-red-500 font-semibold">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                </div>
+                <div className="flex flex-col mx-auto my-5">
+                  <label>{t("input-password")}</label>
+                  <Field name="password">
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="password"
+                          className="border border-blue-200 shadow-sm h-10 text-2xl w-full"
+                        />
+                        {meta.touched && meta.error && (
+                          <span className="text-red-500 font-semibold">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  <div style={{ minHeight: '24px' }}>
+                    {submitError && (
+                      <p className="text-red-500 font-semibold">{submitError}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="mb-10 mt-10 flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-blue-800 h-10 w-20 rounded text-white hover:bg-white hover:text-black hover:border hover:border-black">
+                    {t("login")}
+                  </button>
+                </div>
+              </form>
+            )}
+          />
         </div>
-      </div>
-      <div className="mt-5">
-        <a href="#" className="ml-5">Забыли пароль?</a>
       </div>
     </div>
   );
 }
 
-export default observer(Login);
+export default Login;

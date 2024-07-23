@@ -1,0 +1,9 @@
+{
+    "welcome": "Welcome to \"My Favorite Movies\", {{user}}!",
+    "logout": "Logout",
+    "login": "Login",
+    "input-email": "User name or e-mail",
+    "input-password": "Password",
+    "input-error-empty": "No field should be empty",
+    "input-error-failed": "Incorrect email or password"
+}

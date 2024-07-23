@@ -1,4 +1,4 @@
-const Users = [
+const USERS = [
     {
         id: 1,
         email: "ivan@mail.ru",
@@ -21,6 +21,6 @@ const Users = [
 
 export function fillLocalStorage() {
     if (!localStorage.getItem("users")) {
-        localStorage.setItem("users", JSON.stringify(Users));
+        localStorage.setItem("users", JSON.stringify(USERS));
     }
 }

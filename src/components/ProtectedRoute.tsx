@@ -1,23 +1,21 @@
-import { PropsWithChildren, useContext, useEffect } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Context } from "..";
-import { observer } from "mobx-react-lite";
+import { useAuth } from "./AuthContext";
 
 
 type ProtectedRouteProps = PropsWithChildren;
 
-function ProtectedRoute({ children }: ProtectedRouteProps) {
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { store } = useContext(Context);
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
-    if (!store.isAuth) {
-      navigate('/login', { replace: true, state: { from: location } });
+    if (!isLoggedIn()) {
+      navigate('/login', { state: { from: location.pathname }, replace: true });
     }
-  }, [navigate, store.isAuth, location]);
+  }, [isLoggedIn, location.pathname, navigate]);
 
   return <>{children}</>;
 }
-
-export default observer(ProtectedRoute);
+export default ProtectedRoute;
