@@ -6,12 +6,6 @@ interface SwitchLanguageButtonProps {
     onClick: () => void;
   }
   
-  interface SwitchLanguageButtonProps {
-    language: string;
-    active: boolean;
-    onClick: () => void;
-  }
-  
   const SwitchLanguageButton: FC<SwitchLanguageButtonProps> = ({ language, active, onClick }) => {
     return (
       <button

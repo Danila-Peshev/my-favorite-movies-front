@@ -6,7 +6,7 @@ import router from './routes';
 import { RouterProvider } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
-import LanguageSwitcher from './components/switch_language/LanguageSwitcher';
+import LanguageSwitcher from './components/switch-language/LanguageSwitcher';
 
 fillLocalStorage();
 

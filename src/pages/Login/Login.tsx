@@ -14,14 +14,14 @@ const Login = () => {
   const onSubmit = async (values: { email: any; password: any; }) => {
     const { email, password } = values;
     if (!email || !password) {
-      return { email: t("input-error-empty"), password: t("input-error-empty") };
+      return { email: t("inputErrorEmpty"), password: t("inputErrorEmpty") };
     }
     const success = await login(email, password);
     if (success) {
       const redirectTo = location.state?.from || "/";
       navigate(redirectTo, { replace: true });
     } else {
-      return { [FORM_ERROR]: t("input-error-failed") };
+      return { [FORM_ERROR]: t("inputErrorFailed") };
     }
   };
 
@@ -35,7 +35,7 @@ const Login = () => {
             render={({ handleSubmit, submitError }) => (
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col mx-auto">
-                  <label className="left">{t("input-email")}</label>
+                  <label className="left">{t("inputEmail")}</label>
                   <Field name="email">
                     {({ input, meta }) => (
                       <div>
@@ -52,7 +52,7 @@ const Login = () => {
                   </Field>
                 </div>
                 <div className="flex flex-col mx-auto my-5">
-                  <label>{t("input-password")}</label>
+                  <label>{t("inputPassword")}</label>
                   <Field name="password">
                     {({ input, meta }) => (
                       <div>

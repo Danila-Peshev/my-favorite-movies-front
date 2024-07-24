@@ -9,7 +9,14 @@ type AuthContextType = {
     logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const defaultAuthContext: AuthContextType = {
+    user: null,
+    isLoggedIn: () => false,
+    login: async () => false,
+    logout: () => {}
+}
+
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export const AuthProvider = ({children}: {children: ReactNode}) => {
     const [user, setUser] = useState<User | null>(null);

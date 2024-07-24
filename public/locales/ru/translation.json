@@ -2,8 +2,8 @@
     "welcome": "Пользователь, {{user}} добро пожаловать на сайт \"Моё любимое кино\"!",
     "logout": "Выйти",
     "login": "Войти",
-    "input-email": "Имя пользователя или email",
-    "input-password": "Пароль",
-    "input-error-empty": "Ни одно из полей не должно быть пустым",
-    "input-error-failed": "Неправильный email или пароль"
+    "inputEmail": "Имя пользователя или email",
+    "inputPassword": "Пароль",
+    "inputErrorEmpty": "Поле не должно быть пустым",
+    "inputErrorFailed": "Неправильный email или пароль"
 }

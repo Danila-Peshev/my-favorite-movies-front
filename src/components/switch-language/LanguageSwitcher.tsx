@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import SwitchLanguageButton from "./SwitchLanguageButton";
 
+type Language = 'ru' | 'en';
+
 const LanguageSwitcher = () => {
-    const [activeLanguage, setActiveLanguage] = useState('ru');
+    const [activeLanguage, setActiveLanguage] = useState<Language>('ru');
     const { i18n } = useTranslation();
-  
-    const changeLanguage = useCallback((lng: string) => {
-      i18n.changeLanguage(lng);
-      setActiveLanguage(lng);
-    }, [i18n]);
-  
+
     useEffect(() => {
-      changeLanguage(activeLanguage);
-    }, [activeLanguage, changeLanguage]);
+      i18n.changeLanguage(activeLanguage);
+    }, [activeLanguage, i18n]);
   
     return (
 
