@@ -30,7 +30,7 @@ const Login = () => {
       <img src={logo} className="mx-auto size-40 mb-10 rounded-full" alt='logo' />
         <Form 
           onSubmit={onSubmit}
-          render={({handleSubmit, submitError, valid}) => (
+          render={({handleSubmit, submitError, hasValidationErrors, submitting, pristine}) => (
             <form className="h-80 bg-white border border-blue-200 shadow-xl shadow-blue-200 rounded" onSubmit={handleSubmit}>
               <div className="my-10 w-11/12 mx-auto">
               <Field
@@ -55,7 +55,7 @@ const Login = () => {
               <div className="mb-10 flex justify-end">
                   <button
                     type="submit"
-                    disabled={!valid}
+                    disabled={hasValidationErrors || submitting || pristine}
                     className="bg-blue-800 h-10 w-20 rounded text-white hover:bg-white hover:text-black hover:border hover:border-black disabled:bg-gray-500">
                     {t("login")}
                   </button>
