@@ -28,7 +28,6 @@ const Login = () => {
   return (
     <div className="w-1/4 mt-20 mx-auto">
       <img src={logo} className="mx-auto size-40 mb-10 rounded-full" alt='logo' />
-        
         <Form 
           onSubmit={onSubmit}
           render={({handleSubmit, submitError, submitting, pristine}) => (
