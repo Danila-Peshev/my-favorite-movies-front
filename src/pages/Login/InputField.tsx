@@ -20,7 +20,9 @@ const InputField: FC<InputFieldProps> = ({ input, meta, typeField, label }) => {
           type={typeField}
           className="border border-blue-200 shadow-sm h-10 text-lg w-full"
         />
-        {meta.error && meta.touched && <span className="text-red-500 font-semibold">{meta.error}</span>}
+        {meta.error && meta.touched && (
+          <span className="text-red-500 font-semibold">{meta.error}</span>
+        )}
       </div>
     </div>
   );
