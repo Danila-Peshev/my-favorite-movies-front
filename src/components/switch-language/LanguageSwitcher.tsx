@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import SwitchLanguageButton from "./SwitchLanguageButton";
-
-type Language = "ru" | "en";
+import { useLanguage } from "./LanguageContext";
 
 const LanguageSwitcher = () => {
-  const [activeLanguage, setActiveLanguage] = useState<Language>("ru");
+  const { activeLanguage, changeLanguage } = useLanguage();
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -17,12 +16,12 @@ const LanguageSwitcher = () => {
       <SwitchLanguageButton
         language="EN"
         active={activeLanguage === "en"}
-        onClick={() => setActiveLanguage("en")}
+        onClick={() => changeLanguage("en")}
       />
       <SwitchLanguageButton
         language="RU"
         active={activeLanguage === "ru"}
-        onClick={() => setActiveLanguage("ru")}
+        onClick={() => changeLanguage("ru")}
       />
     </div>
   );

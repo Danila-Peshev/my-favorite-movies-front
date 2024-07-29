@@ -15,7 +15,7 @@ const SwitchLanguageButton: FC<SwitchLanguageButtonProps> = ({
     <button
       onClick={onClick}
       className={`w-12 border border-solid border-black rounded ${
-        active ? "bg-blue-800 text-white" : "bg-gray-200 text-blue-950"
+        active ? "bg-white text-blue-950" : "bg-blue-800 text-white"
       }`}
     >
       {language}
