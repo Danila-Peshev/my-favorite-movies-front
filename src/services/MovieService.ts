@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Genre } from "../types/movie-api-types/Genre";
 import { MoviesResponse } from "../types/movie-api-types/MoviesResponse";
-import { OnlyMovie } from "../types/movie-api-types/OnlyMovie";
+import { SimpleMovie } from "../types/movie-api-types/SimpleMovie";
 
 const headers = {
   Accept: 'application/json',
@@ -51,7 +51,7 @@ export async function getMoviesByGenres(genreIds: number[], activePage: number |
   return response.data;
 } 
 
-export async function getMovieById(id: number, activeLanguage: string): Promise<OnlyMovie> {
+export async function getMovieById(id: number, activeLanguage: string): Promise<SimpleMovie> {
   const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/movie/${id}`, {
     headers,
     params: {
@@ -59,5 +59,18 @@ export async function getMovieById(id: number, activeLanguage: string): Promise<
     } 
   }
   )
-  return response.data;
+
+  const movie: SimpleMovie = {
+    backdrop_path: response.data.backdrop_path,
+    genres: response.data.genres,
+    overview: response.data.overview,
+    popularity: response.data.popularity,
+    poster_path: response.data.poster_path,
+    release_date: response.data.release_date,
+    title: response.data.title,
+    vote_average: response.data.vote_average,
+    vote_count: response.data.vote_count
+  }
+
+  return movie;
 }

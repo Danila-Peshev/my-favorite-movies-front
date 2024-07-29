@@ -5,6 +5,7 @@ import { Movie } from "../../types/movie-api-types/Movie";
 import { getAllGenres, getMoviesByGenres } from "../../services/MovieService";
 import { useLanguage } from "../../components/switch-language/LanguageContext";
 import { Genre } from "../../types/movie-api-types/Genre";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const { logout, user } = useAuth();
@@ -82,7 +83,7 @@ const Home = () => {
       </div>
       <div className="mt-14 w-11/12 mx-auto flex flex-wrap">
         {movies.map((movie) => (
-          <a key={movie.id} className="w-80 mx-auto mb-7" href="#">
+          <Link key={movie.id} className="w-80 mx-auto mb-7" to={`/movie/${movie.id}`}>
             <span className="text-2xl w-64">
               {movie.title} ({movie.release_date.split("-")[0]})
             </span>
@@ -91,7 +92,7 @@ const Home = () => {
               alt={movie.title}
               src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
             />
-          </a>
+          </Link>
         ))}
       </div>
       <div>
