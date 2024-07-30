@@ -14,7 +14,24 @@ const headers = {
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
   headers,
+  timeout: 15000,
 });
+
+apiClient.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.code === 'ECONNABORTED') {
+      return Promise.reject(new Error('Request timed out'));
+    }
+    if (error.response) {
+      return Promise.reject(new Error('Status not 200'));
+    } else if (error.request) {
+      return Promise.reject(new Error('Network Error'));
+    } else {
+      return Promise.reject(new Error(`Request Error: ${error.message}`));
+    }
+  }
+);
 
 async function fetchFromApi(endpoint: string, params: object): Promise<any> {
   const response = await apiClient.get(endpoint, { params });
