@@ -1,7 +1,6 @@
 import { ReactNode, useState, useContext } from "react";
 import { createContext } from "react";
-
-type Language = "ru" | "en";
+import { Language } from "../../types/Language";
 
 type LanguageContextType = {
   activeLanguage: Language;

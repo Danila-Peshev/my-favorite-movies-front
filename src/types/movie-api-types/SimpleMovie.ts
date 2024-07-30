@@ -1,8 +1,9 @@
 import { Genre } from "./Genre"
 
 export type SimpleMovie = {
+  id: number
   backdrop_path: string
-  genres: Genre[]
+  genre_ids: number[]
   overview: string
   popularity: number
   poster_path: string

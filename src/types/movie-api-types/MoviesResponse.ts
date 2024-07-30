@@ -1,8 +1,8 @@
-import { Movie } from "./Movie";
+import { SimpleMovie } from "./SimpleMovie";
 
 export type MoviesResponse = {
   page: number;
-  results: Movie[];
+  results: SimpleMovie[];
   total_pages: number;
   total_result: number;
 }
