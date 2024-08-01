@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import SwitchLanguageButton from "./SwitchLanguageButton";
 import { useLanguage } from "./LanguageContext";
 

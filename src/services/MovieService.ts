@@ -71,26 +71,26 @@ export async function getMoviesByFilters({
   const simpleMovies: SimpleMovie[] = data.results.map(
     ({
       id,
-      backdrop_path,
-      genre_ids,
+      backdropPath,
+      genreIds,
       overview,
       popularity,
-      poster_path,
-      release_date,
+      posterPath,
+      releaseDate,
       title,
-      vote_average,
-      vote_count,
+      voteAverage,
+      voteCount
     }: Movie) => ({
       id,
-      backdrop_path,
-      genre_ids,
+      backdropPath,
+      genreIds,
       overview,
       popularity,
-      poster_path,
-      release_date,
+      posterPath,
+      releaseDate,
       title,
-      vote_average,
-      vote_count,
+      voteAverage,
+      voteCount
     })
   );
 
