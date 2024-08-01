@@ -4,7 +4,6 @@ import { MoviesResponse } from "../types/movie-api-types/MoviesResponse";
 import { SimpleMovie } from "../types/movie-api-types/SimpleMovie";
 import { Language } from "../types/Language";
 import { Movie } from "../types/movie-api-types/Movie";
-import { OnlyMovie } from "../types/movie-api-types/OnlyMovie";
 
 const headers = {
   Accept: "application/json",
@@ -38,19 +37,19 @@ async function fetchFromApi(endpoint: string, params: object): Promise<any> {
   return response.data;
 }
 
-export async function getAllGenres(activeLanguage: string): Promise<Genre[]> {
-  const data = await fetchFromApi('/genre/movie/list', { language: activeLanguage });
+export async function getAllGenres(language: string): Promise<Genre[]> {
+  const data = await fetchFromApi('/genre/movie/list', { language: language });
   return data.genres;
 }
 
 export async function getMoviesByFilters({
-  activeLanguage = "ru",
+  language = "ru",
   genreIds = [],
   minCountVotes = 0,
   releaseYear = 0,
   activePage = 1,
 }: {
-  activeLanguage?: Language;
+  language?: Language;
   genreIds?: number[];
   minCountVotes?: number;
   releaseYear?: number;
@@ -60,7 +59,7 @@ export async function getMoviesByFilters({
     include_adult: false,
     include_video: false,
     with_genres: genreIds,
-    language: activeLanguage,
+    language: language,
     page: activePage,
     sort_by: "popularity.desc",
     "vote_count.gte": minCountVotes,
@@ -69,80 +68,73 @@ export async function getMoviesByFilters({
 
   const simpleMovies: SimpleMovie[] = data.results.map((movie: Movie) => ({
     id: movie.id,
-    backdrop_path: movie.backdrop_path,
-    genre_ids: movie.genre_ids,
+    backdropPath: movie.backdrop_path,
+    genreIds: movie.genre_ids,
     overview: movie.overview,
     popularity: movie.popularity,
-    poster_path: movie.poster_path,
-    release_date: movie.release_date,
+    posterPath: movie.poster_path,
+    releaseDate: movie.release_date,
     title: movie.title,
-    vote_average: movie.vote_average,
-    vote_count: movie.vote_count,
+    voteAverage: movie.vote_average,
+    voteCount: movie.vote_count,
   }));
 
   return {
     page: data.page,
     results: simpleMovies,
-    total_pages: data.total_pages,
-    total_result: data.total_results,
+    totalPages: data.total_pages,
+    totalResult: data.total_results,
   };
 }
 
 export async function getFavoriteMoviesByIds({
-  ids = [],
-  activeLanguage = "ru",
+  ids,
+  language = "ru",
   page = 1
 }: {
-  ids?: number[],
-  activeLanguage?: Language,
+  ids: number[],
+  language?: Language,
   page?: number
-} = {}): Promise<MoviesResponse> {
-  if (ids.length === 0) {
-    return {
-      page,
-      results: [],
-      total_pages: 0,
-      total_result: 0,
-    };
-  }
+}): Promise<MoviesResponse> {
 
-  const results = await Promise.all(ids.map(id => getMovieById({ id, activeLanguage })));
+  const results = await Promise.all(ids.map(id => getMovieById({ id, language })));
+  const maxMoviesOnPage = 20;
 
-  const total_result = results.length;
-  const total_pages = Math.ceil(total_result / 20);
+  const totalResult = results.length;
+  const totalPages = Math.ceil(totalResult / maxMoviesOnPage);
 
-  const startIndex = (page - 1) * 20;
-  const endIndex = startIndex + 20;
+  const startIndex = (page - 1) * maxMoviesOnPage;
+  const endIndex = startIndex + maxMoviesOnPage;
 
   const paginatedResults = results.slice(startIndex, endIndex);
 
   return {
     page,
     results: paginatedResults,
-    total_pages,
-    total_result,
+    totalPages,
+    totalResult,
   };
 }
 
 export async function getMovieById({
   id,
-  activeLanguage = "ru"
+  language = "ru"
 }: {
   id: number, 
-  activeLanguage?: Language
+  language?: Language
 }): Promise<SimpleMovie> {
-  const data: OnlyMovie = await fetchFromApi(`/movie/${id}`, { language: activeLanguage });
+  const data = await fetchFromApi(`/movie/${id}`, { language: language });
 
   return {
     id: data.id,
-    backdrop_path: data.backdrop_path,
-    genre_ids: data.genres.map((genre) => genre.id),
+    backdropPath: data.backdrop_path,
+    genreIds: data.genres.map((genre: { id: number; }) => genre.id),
     overview: data.overview,
     popularity: data.popularity,
-    poster_path: data.poster_path,
-    release_date: data.release_date,
+    posterPath: data.poster_path,
+    releaseDate: data.release_date,
     title: data.title,
-    vote_average: data.vote_average,
-    vote_count: data.vote_count,
+    voteAverage: data.vote_average,
+    voteCount: data.vote_count,
   };
 }

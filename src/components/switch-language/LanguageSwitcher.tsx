@@ -4,23 +4,23 @@ import SwitchLanguageButton from "./SwitchLanguageButton";
 import { useLanguage } from "./LanguageContext";
 
 const LanguageSwitcher = () => {
-  const { activeLanguage, changeLanguage } = useLanguage();
+  const { language, changeLanguage } = useLanguage();
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    i18n.changeLanguage(activeLanguage);
-  }, [activeLanguage, i18n]);
+    i18n.changeLanguage(language);
+  }, [language, i18n]);
 
   return (
     <div className="flex space-x-2">
       <SwitchLanguageButton
         language="EN"
-        active={activeLanguage === "en"}
+        active={language === "en"}
         onClick={() => changeLanguage("en")}
       />
       <SwitchLanguageButton
         language="RU"
-        active={activeLanguage === "ru"}
+        active={language === "ru"}
         onClick={() => changeLanguage("ru")}
       />
     </div>
