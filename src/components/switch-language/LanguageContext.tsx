@@ -1,6 +1,7 @@
-import { ReactNode, useState, useContext } from "react";
+import { ReactNode, useState, useContext, useEffect } from "react";
 import { createContext } from "react";
 import { Language } from "../../types/Language";
+import i18n from "../../i18n";
 
 type LanguageContextType = {
   language: Language;
@@ -20,6 +21,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const changeLanguage = (language: Language) => {
     setlanguage(language);
   }
+
+  useEffect(() => {
+    i18n.changeLanguage(language);
+  }, [language, i18n]);
 
   return (
     <LanguageContext.Provider value={{ language, changeLanguage }}>

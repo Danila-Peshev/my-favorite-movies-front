@@ -5,11 +5,6 @@ import { useLanguage } from "./LanguageContext";
 
 const LanguageSwitcher = () => {
   const { language, changeLanguage } = useLanguage();
-  const { i18n } = useTranslation();
-
-  useEffect(() => {
-    i18n.changeLanguage(language);
-  }, [language, i18n]);
 
   return (
     <div className="flex space-x-2">
