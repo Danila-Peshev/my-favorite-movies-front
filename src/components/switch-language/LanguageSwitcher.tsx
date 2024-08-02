@@ -1,28 +1,20 @@
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import SwitchLanguageButton from "./SwitchLanguageButton";
-
-type Language = "ru" | "en";
+import { useLanguage } from "./LanguageContext";
 
 const LanguageSwitcher = () => {
-  const [activeLanguage, setActiveLanguage] = useState<Language>("ru");
-  const { i18n } = useTranslation();
-
-  useEffect(() => {
-    i18n.changeLanguage(activeLanguage);
-  }, [activeLanguage, i18n]);
+  const { language, changeLanguage } = useLanguage();
 
   return (
     <div className="flex space-x-2">
       <SwitchLanguageButton
         language="EN"
-        active={activeLanguage === "en"}
-        onClick={() => setActiveLanguage("en")}
+        active={language === "en"}
+        onClick={() => changeLanguage("en")}
       />
       <SwitchLanguageButton
         language="RU"
-        active={activeLanguage === "ru"}
-        onClick={() => setActiveLanguage("ru")}
+        active={language === "ru"}
+        onClick={() => changeLanguage("ru")}
       />
     </div>
   );
