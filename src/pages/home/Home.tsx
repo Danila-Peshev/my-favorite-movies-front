@@ -1,4 +1,4 @@
-import { useAuth } from "../../components/AuthContext";
+import { useAuth } from "../../global-components/AuthContext";
 import { useTranslation } from "react-i18next";
 
 const Home = () => {
