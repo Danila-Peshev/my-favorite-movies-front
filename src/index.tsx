@@ -8,6 +8,7 @@ import { LanguageProvider } from "./global-components/switch-language/LanguageCo
 import i18n from "./i18n";
 import router from "./routes";
 import NavBar from "./global-components/NavBar";
+import { ViewProvider } from "./components/movies-block/switch-view/ViewContext";
 
 fillLocalStorage();
 

@@ -1,10 +1,19 @@
 {
-    "welcome": "Привет, {{user}}",
-    "title": "Мои Избранные Фильмы",
-    "logout": "Выйти",
-    "login": "Войти",
-    "inputEmail": "Имя пользователя или email",
-    "inputPassword": "Пароль",
-    "inputErrorEmpty": "Поле не должно быть пустым",
-    "inputErrorFailed": "Неправильный email или пароль"
+  "welcome": "Привет, {{user}}",
+  "title": "Мои Избранные Фильмы",
+  "logout": "Выйти",
+  "login": "Войти",
+  "inputEmail": "Имя пользователя или email",
+  "inputPassword": "Пароль",
+  "inputErrorEmpty": "Поле не должно быть пустым",
+  "inputErrorFailed": "Неправильный email или пароль",
+  "selectYouFavoriteGenres": "Выберите свои избранные жанры:",
+  "addMoviesToYourFavorite": "Добавьте фильмы в своё избранное:",
+  "yourFavoriteMovies": "Ваши избранные фильмы:",
+  "loading": "загрузка...",
+  "requestError": "Что-то пошло не так.",
+  "firstPage": "Первая",
+  "lastPage": "Последняя",
+  "add": "ДОБАВИТЬ",
+  "NotSingleMovieWasFound": "Не найдено ни одного фильма"
 }
