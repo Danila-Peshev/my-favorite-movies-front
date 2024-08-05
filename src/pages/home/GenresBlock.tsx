@@ -25,7 +25,7 @@ const GenresBlock: FC<GenresBlockProps> = ({ genres }) => {
 
   useEffect(() => {
     setFavoriteGenresId(getFavoriteGenresId());
-  }, [user]);
+  }, [user?.favoriteGenresId]);
 
   return (
     <div className="w-full">

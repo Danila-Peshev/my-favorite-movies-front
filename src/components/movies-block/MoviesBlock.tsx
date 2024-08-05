@@ -71,7 +71,7 @@ const MoviesBlock: FC<MoviesBlockProps> = ({ genres, isOnAddedPage }) => {
 
   useEffect(() => {
     fetchMoviesResponse();
-  }, [language, user, page]);
+  }, [language, user?.favoriteMoviesId, user?.watchedMoviesId, page]);
 
   if (isLoading) {
     return <span>{t("loading")}</span>;
