@@ -12,9 +12,15 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     if (!isLoggedIn()) {
       navigate("/login", { state: { from: location.pathname }, replace: true });
+      return;
     }
   }, [isLoggedIn, location.pathname, navigate]);
 
+  if (!isLoggedIn()) {
+    return null;
+  }
+
   return <>{children}</>;
 };
+
 export default ProtectedRoute;

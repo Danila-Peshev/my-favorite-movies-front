@@ -4,8 +4,7 @@ import { MoviesResponse } from "../types/movie-api-types/MoviesResponse";
 import { SimpleMovie } from "../types/movie-api-types/SimpleMovie";
 import { Language } from "../types/Language";
 import { Movie } from "../types/movie-api-types/Movie";
-
-const MAX_MOVIES_ON_PAGE = 20;
+import { MAX_MOVIES_ON_PAGE } from "../constants/movie_constants";
 
 const headers = {
   Accept: "application/json",
@@ -71,26 +70,26 @@ export async function getMoviesByFilters({
   const simpleMovies: SimpleMovie[] = data.results.map(
     ({
       id,
-      backdropPath,
-      genreIds,
+      backdrop_path,
+      genre_ids,
       overview,
       popularity,
-      posterPath,
-      releaseDate,
+      poster_path,
+      release_date,
       title,
-      voteAverage,
-      voteCount
+      vote_average,
+      vote_count,
     }: Movie) => ({
       id,
-      backdropPath,
-      genreIds,
+      backdropPath: backdrop_path,
+      genreIds: genre_ids,
       overview,
       popularity,
-      posterPath,
-      releaseDate,
+      posterPath: poster_path,
+      releaseDate: release_date,
       title,
-      voteAverage,
-      voteCount
+      voteAverage: vote_average,
+      voteCount: vote_count,
     })
   );
 

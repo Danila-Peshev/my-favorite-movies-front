@@ -1,25 +1,51 @@
-import { useAuth } from "../../components/AuthContext";
+import GenresBlock from "./GenresBlock";
+import { useEffect, useState } from "react";
+import { Genre } from "../../types/movie-api-types/Genre";
+import { getAllGenres } from "../../services/MovieService";
+import { useLanguage } from "../../global-components/switch-language/LanguageContext";
+import MoviesBlock from "../../components/movies-block/MoviesBlock";
+import { ViewProvider } from "../../components/movies-block/switch-view/ViewContext";
 import { useTranslation } from "react-i18next";
 
 const Home = () => {
-  const { logout, user } = useAuth();
+  const { language } = useLanguage();
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const { t } = useTranslation();
 
+  async function fetchGenres() {
+    setLoading(true);
+    setError(false);
+    try {
+      const fetchedGenres = await getAllGenres(language);
+      setGenres(fetchedGenres);
+    } catch (err) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchGenres();
+  }, [language]);
+
   return (
-    <div className="w-full text-center mt-96">
-      <h1 className="text-4xl font-bold">
-        {t("welcome", { user: user?.email })}
-      </h1>
-      <div className="mt-10">
-        <button
-          onClick={() => logout()}
-          className="border-2 border-black rounded w-20 
-          hover:bg-black hover:border-gray-300 hover:text-white"
-        >
-          {t("logout")}
-        </button>
+    <ViewProvider>
+      <div className="w-11/12 flex flex-col gap-y-5 p-5 mx-auto mt-24 mb-12 text-white text-base font-medium bg-gray-900 rounded">
+        {loading ? (
+          t("loading")
+        ) : error ? (
+          t("requestError")
+        ) : (
+          <>
+            <GenresBlock genres={genres} />
+            <MoviesBlock genres={genres} isOnAddedPage={false} />
+          </>
+        )}
       </div>
-    </div>
+    </ViewProvider>
   );
 };
 

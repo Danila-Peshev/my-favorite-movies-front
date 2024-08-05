@@ -1,5 +1,5 @@
 import logo from "../../assets/logo/logo.png";
-import { useAuth } from "../../components/AuthContext";
+import { useAuth } from "../../global-components/AuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Field, Form } from "react-final-form";

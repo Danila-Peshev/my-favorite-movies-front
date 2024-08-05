@@ -14,8 +14,8 @@ const SwitchLanguageButton: FC<SwitchLanguageButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className={`w-12 border border-solid border-black rounded ${
-        active ? "bg-white text-blue-950" : "bg-blue-800 text-white"
+      className={`hover:bg-blue-950 hover:text-white font-medium rounded-lg text-xs px-4 py-2 text-center ${
+        active ? "bg-white text-blue-700" : "bg-blue-700 text-white"
       }`}
     >
       {language}
@@ -24,3 +24,4 @@ const SwitchLanguageButton: FC<SwitchLanguageButtonProps> = ({
 };
 
 export default SwitchLanguageButton;
+
