@@ -48,26 +48,26 @@ export async function getMoviesByFilters({
   genreIds = [],
   minCountVotes = 0,
   releaseYear = 0,
-  activePage = 1,
+  page = 1,
 }: {
   language?: Language;
   genreIds?: number[];
   minCountVotes?: number;
   releaseYear?: number;
-  activePage?: number;
+  page?: number;
 } = {}): Promise<MoviesResponse> {
   const data = await fetchFromApi("/discover/movie", {
     include_adult: false,
     include_video: false,
     with_genres: genreIds,
     language: language,
-    page: activePage,
+    page,
     sort_by: "popularity.desc",
     "vote_count.gte": minCountVotes,
     primary_release_year: releaseYear,
   });
 
-  const simpleMovies: SimpleMovie[] = data.results.map(
+  const movies: SimpleMovie[] = data.results.map(
     ({
       id,
       backdrop_path,
@@ -95,7 +95,7 @@ export async function getMoviesByFilters({
 
   return {
     page: data.page,
-    results: simpleMovies,
+    results: movies,
     totalPages: data.total_pages,
     totalResult: data.total_results,
   };

@@ -1,5 +1,16 @@
 import { FC } from "react";
-import { useTranslation } from "react-i18next";
+
+const createPageNumbers = (totalPages: number, page: number) => {
+  const pages = [];
+  const startPage = Math.max(1, page - 5);
+  const endPage = Math.min(totalPages, page + 5);
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+
+  return pages;
+};
 
 interface PaginationBlockProps {
   page: number;
@@ -12,30 +23,22 @@ const PaginationBlock: FC<PaginationBlockProps> = ({
   totalPages,
   setPage,
 }) => {
-  const { t } = useTranslation();
-  const createPageNumbers = () => {
-    const pages = [];
-    const startPage = Math.max(1, page - 5);
-    const endPage = Math.min(totalPages, page + 5);
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return pages;
-  };
+  const visiblePages = createPageNumbers(totalPages, page);
 
   return (
     <div className="flex justify-center mt-5 space-x-2">
-      {page > 1 && (
+      {page > 1 && !visiblePages.includes(1) && (
+        <>
         <button
           onClick={() => setPage(1)}
           className="text-white bg-blue-800 rounded-sm px-4 py-1"
         >
-          {t("firstPage")}
+          1
         </button>
+        <span> . . . </span>
+        </>
       )}
-      {createPageNumbers().map((pageNumber) => (
+      {visiblePages.map((pageNumber) => (
         <button
           key={pageNumber}
           onClick={() => setPage(pageNumber)}
@@ -46,13 +49,16 @@ const PaginationBlock: FC<PaginationBlockProps> = ({
           {pageNumber}
         </button>
       ))}
-      {page < totalPages && (
+      {page < totalPages && !visiblePages.includes(totalPages) && (
+        <>
+        <span> . . . </span>
         <button
           onClick={() => setPage(totalPages)}
           className="text-white bg-blue-800 rounded-sm px-4 py-1"
         >
-          {t("lastPage")}
+          {totalPages}
         </button>
+        </>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import SwitchViewButton from "./SwitchViewButton";
-import row_view from "../../../assets/views-images/row_view.png";
-import block_view from "../../../assets/views-images/block_view.png";
+import row_view from "../../../../assets/views-images/row_view.svg";
+import block_view from "../../../../assets/views-images/block_view.svg";
 import { useView } from "./ViewContext";
 
 const ViewSwitcher = () => {

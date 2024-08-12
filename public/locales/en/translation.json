@@ -12,8 +12,6 @@
   "yourFavoriteMovies": "Your favorite movies:",
   "loading": "loading...",
   "requestError": "Something's wrong.",
-  "firstPage": "First",
-  "lastPage": "Last",
   "add": "ADD",
   "NotSingleMovieWasFound": "Not a single movie was found"
 }

@@ -12,8 +12,6 @@
   "yourFavoriteMovies": "Ваши избранные фильмы:",
   "loading": "загрузка...",
   "requestError": "Что-то пошло не так.",
-  "firstPage": "Первая",
-  "lastPage": "Последняя",
   "add": "ДОБАВИТЬ",
   "NotSingleMovieWasFound": "Не найдено ни одного фильма"
 }

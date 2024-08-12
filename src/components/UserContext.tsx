@@ -1,18 +1,9 @@
-import {
-  createContext,
-  useContext,
-  ReactNode,
-  useState,
-  useEffect,
-} from "react";
+import { ReactNode, useContext } from "react";
+import { createContext } from "react";
 import { User } from "../types/User";
-import { findByEmail } from "../repositories/UserRepository";
+import { useAuth } from "./AuthContext";
 
-type AuthContextType = {
-  user: User | null;
-  isLoggedIn: () => boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+type UserContextType = {
   getFavoriteGenresId: () => number[];
   getFavoriteMoviesId: () => number[];
   getWatchedMoviesId: () => number[];
@@ -24,11 +15,7 @@ type AuthContextType = {
   removeFavoriteGenre: (genreId: number) => void;
 };
 
-const defaultAuthContext: AuthContextType = {
-  user: null,
-  isLoggedIn: () => false,
-  login: async () => false,
-  logout: () => {},
+const defaultUserContext: UserContextType = {
   getFavoriteGenresId: () => [],
   getFavoriteMoviesId: () => [],
   getWatchedMoviesId: () => [],
@@ -40,35 +27,10 @@ const defaultAuthContext: AuthContextType = {
   removeFavoriteGenre: () => {},
 };
 
-const AuthContext = createContext<AuthContextType>(defaultAuthContext);
+const UserContext = createContext<UserContextType>(defaultUserContext);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [componentIsReady, setComponentIsReady] = useState(false);
-
-  useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("user") || "null"));
-    setComponentIsReady(true);
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    const optionalUser = await findByEmail(email);
-    if (optionalUser && password === optionalUser.password) {
-      localStorage.setItem("user", JSON.stringify(optionalUser));
-      setUser(optionalUser);
-      return true;
-    }
-    return false;
-  };
-
-  const isLoggedIn = () => {
-    return !!user;
-  };
-
-  const logout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-  };
+export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const { user, setUser } = useAuth();
 
   const getFavoriteGenresId = () => {
     if (user) {
@@ -160,12 +122,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider
+    <UserContext.Provider
       value={{
-        user,
-        isLoggedIn,
-        login,
-        logout,
         addFavoriteMovie,
         removeFavoriteMovie,
         addWatchedMovie,
@@ -177,9 +135,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         getWatchedMoviesId,
       }}
     >
-      {componentIsReady ? children : null}
-    </AuthContext.Provider>
+      {children}
+    </UserContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useUser = () => useContext(UserContext);
