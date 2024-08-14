@@ -21,20 +21,38 @@ import {
   removeWatchedMovieByUserId,
 } from "../../services/UserDataService";
 
+const defaultMoviesResponse: MoviesResponse = {
+  page: 1,
+  results: [],
+  totalPages: 1,
+  totalResult: 0,
+};
+
 const Home = () => {
   const { language } = useLanguage();
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [moviesResponse, setMoviesResponse] = useState<MoviesResponse>({
-    page: 1,
-    results: [],
-    totalPages: 1,
-    totalResult: 0,
-  });
+  const [moviesResponse, setMoviesResponse] = useState<MoviesResponse>(
+    defaultMoviesResponse
+  );
   const [watchedMovies, setWatchedMovies] = useState<number[]>([]);
   const { user } = useAuth();
   const [page, setPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    fetchGenres();
+    fetchMoviesResponse();
+    fetchWatchedMovies();
+  }, [language]);
+
+  useEffect(() => {
+    fetchMoviesResponse();
+  }, [page]);
+
+  if (!user) {
+    return null;
+  }
 
   const handleClickWatched = (movieId: number) => {
     if (watchedMovies.includes(movieId)) {
@@ -59,19 +77,27 @@ const Home = () => {
   async function fetchMoviesResponse() {
     setIsLoading(true);
     try {
-      const movies = await getFavoriteMoviesByIds({
-        ids: getFavoriteMoviesByUserId(user.id),
-        language,
-        page,
-      });
-      setMoviesResponse(movies);
+      if (user) {
+        const movies = await getFavoriteMoviesByIds({
+          ids: getFavoriteMoviesByUserId(user.id),
+          language,
+          page,
+        });
+        setMoviesResponse(movies);
+      } else {
+        setMoviesResponse(defaultMoviesResponse);
+      }
     } finally {
       setIsLoading(false);
     }
   }
 
   function fetchWatchedMovies() {
-    setWatchedMovies(getWatchedMoviesByUserId(user.id));
+    if (user) {
+      setWatchedMovies(getWatchedMoviesByUserId(user.id));
+    } else {
+      setWatchedMovies([]);
+    }
   }
 
   async function fetchGenres() {
@@ -83,16 +109,6 @@ const Home = () => {
       setIsLoading(false);
     }
   }
-
-  useEffect(() => {
-    fetchGenres();
-    fetchMoviesResponse();
-    fetchWatchedMovies();
-  }, [language]);
-
-  useEffect(() => {
-    fetchMoviesResponse();
-  }, [page]);
 
   return (
     <ViewProvider>

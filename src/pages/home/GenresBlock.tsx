@@ -18,8 +18,16 @@ const GenresBlock: FC<GenresBlockProps> = ({ genres }) => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    setFavoriteGenresId(getFavoriteGenresByUserId(user.id));
+    if (user) {
+      setFavoriteGenresId(getFavoriteGenresByUserId(user.id));
+    } else {
+      setFavoriteGenresId([]);
+    }
   }, []);
+
+  if (!user) {
+    return null;
+  }
 
   const handleClickOnGenre = (genreId: number) => {
     if (favoriteGenresId.includes(genreId)) {
