@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
-import Add from "./pages/add/Add";
 
 const router = createBrowserRouter([
   {
@@ -10,14 +9,6 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Home />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/add",
-    element: (
-      <ProtectedRoute>
-        <Add />
       </ProtectedRoute>
     ),
   },
