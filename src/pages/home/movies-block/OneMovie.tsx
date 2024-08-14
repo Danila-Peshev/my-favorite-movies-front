@@ -40,7 +40,7 @@ const OneMovie: FC<OneMovieProps> = ({
         <img
           className={`rounded ${isBlockView ? null : `relative h-40`}`}
           alt={movie.title}
-          src={`https://image.tmdb.org/t/p/w400${movie.posterPath}`}
+          src={process.env.REACT_APP_MEDIA_URL + movie.posterPath}
         />
         <div className={`w-11/12 ${isBlockView ? null : `mx-4`}`}>
           <h3 className="text-xl font-semibold">{movie.title}</h3>
