@@ -2,7 +2,11 @@ import { FC, useState, useEffect } from "react";
 import { useAuth } from "../../components/AuthContext";
 import { Genre } from "../../types/movie-api-types/Genre";
 import { useTranslation } from "react-i18next";
-import { useUser } from "../../components/UserContext";
+import {
+  addFavoriteGenreByUserId,
+  getFavoriteGenresByUserId,
+  removeFavoriteGenreByUserId,
+} from "../../services/UserDataService";
 
 interface GenresBlockProps {
   genres: Genre[];
@@ -10,23 +14,23 @@ interface GenresBlockProps {
 
 const GenresBlock: FC<GenresBlockProps> = ({ genres }) => {
   const { user } = useAuth();
-  const { getFavoriteGenresId, removeFavoriteGenre, addFavoriteGenre } = useUser();
-  const [favoriteGenresId, setFavoriteGenresId] = useState<number[]>(
-    getFavoriteGenresId()
-  );
+  const [favoriteGenresId, setFavoriteGenresId] = useState<number[]>([]);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    setFavoriteGenresId(getFavoriteGenresByUserId(user.id));
+  }, []);
 
   const handleClickOnGenre = (genreId: number) => {
     if (favoriteGenresId.includes(genreId)) {
-      removeFavoriteGenre(genreId);
+      removeFavoriteGenreByUserId(user.id, genreId);
     } else {
-      addFavoriteGenre(genreId);
+      addFavoriteGenreByUserId(user.id, genreId);
     }
-  };
 
-  useEffect(() => {
-    setFavoriteGenresId(getFavoriteGenresId());
-  }, [user?.favoriteGenresId]);
+    const updatedFavoriteGenres = getFavoriteGenresByUserId(user.id);
+    setFavoriteGenresId(updatedFavoriteGenres);
+  };
 
   return (
     <div className="w-full">
@@ -34,7 +38,7 @@ const GenresBlock: FC<GenresBlockProps> = ({ genres }) => {
       <div className="mt-5 grid grid-cols-10 grid-rows-2 gap-2">
         {genres.map((genre) => (
           <button
-          key={genre.id}
+            key={genre.id}
             className={`hover:bg-blue-950 hover:text-white rounded-full px-5 py-2 overflow-hidden truncate ${
               favoriteGenresId.includes(genre.id)
                 ? "bg-white text-blue-950"

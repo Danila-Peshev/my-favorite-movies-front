@@ -3,7 +3,7 @@ import { useAuth } from "./AuthContext";
 import LanguageSwitcher from "./switch-language/LanguageSwitcher";
 
 const NavBar = () => {
-  const { logout, user } = useAuth();
+  const { logout, isLoggedIn, user } = useAuth();
   const { t } = useTranslation();
 
   return (
@@ -15,10 +15,10 @@ const NavBar = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <span className="text-white text-2xl">{t("title")}</span>
         </div>
-        {user && (
+        {isLoggedIn() && (
           <div className="flex items-center space-x-3">
             <span className="text-white font-medium text-sm">
-              {t("welcome", { user: user?.email })}
+              {t("welcome", { user: user.email })}
             </span>
             <span className="text-white font-medium text-sm">|</span>
             <button

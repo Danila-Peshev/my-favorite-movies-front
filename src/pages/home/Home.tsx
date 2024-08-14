@@ -4,7 +4,6 @@ import { Genre } from "../../types/movie-api-types/Genre";
 import {
   getAllGenres,
   getFavoriteMoviesByIds,
-  getMoviesByFilters,
 } from "../../services/MovieService";
 import { useLanguage } from "../../components/switch-language/LanguageContext";
 import MoviesBlock from "./movies-block/MoviesBlock";
@@ -14,7 +13,13 @@ import { MoviesResponse } from "../../types/movie-api-types/MoviesResponse";
 import { MAX_TOTAL_PAGES } from "../../constants/movie_constants";
 import PaginationBlock from "./movies-block/PaginationBlock";
 import { useAuth } from "../../components/AuthContext";
-import { useUser } from "../../components/UserContext";
+import {
+  addWatchedMovieByUserId,
+  getFavoriteMoviesByUserId,
+  getWatchedMoviesByUserId,
+  removeFavoriteMovieByUserId,
+  removeWatchedMovieByUserId,
+} from "../../services/UserDataService";
 
 const Home = () => {
   const { language } = useLanguage();
@@ -25,16 +30,26 @@ const Home = () => {
     totalPages: 1,
     totalResult: 0,
   });
+  const [watchedMovies, setWatchedMovies] = useState<number[]>([]);
   const { user } = useAuth();
   const [page, setPage] = useState<number>(1);
-  const [status, setStatus] = useState({
-    loadingGenres: true,
-    errorGenres: false,
-    loadingMovies: true,
-    errorMovies: false,
-  });
-  const { getFavoriteMoviesId } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
+
+  const handleClickWatched = (movieId: number) => {
+    if (watchedMovies.includes(movieId)) {
+      removeWatchedMovieByUserId(user.id, movieId);
+    } else {
+      addWatchedMovieByUserId(user.id, movieId);
+    }
+    fetchWatchedMovies();
+    fetchMoviesResponse();
+  };
+
+  const handleClickRemove = (movieId: number) => {
+    removeFavoriteMovieByUserId(user.id, movieId);
+    fetchMoviesResponse();
+  };
 
   const totalPages = Math.min(
     moviesResponse ? moviesResponse.totalPages : 1,
@@ -42,59 +57,48 @@ const Home = () => {
   );
 
   async function fetchMoviesResponse() {
-    setStatus((prevStatus) => ({
-      ...prevStatus,
-      loadingMovies: true,
-      errorMovies: false,
-    }));
+    setIsLoading(true);
     try {
       const movies = await getFavoriteMoviesByIds({
-        ids: getFavoriteMoviesId(),
+        ids: getFavoriteMoviesByUserId(user.id),
         language,
         page,
       });
       setMoviesResponse(movies);
-    } catch (err) {
-      setStatus((prevStatus) => ({ ...prevStatus, errorMovies: true }));
     } finally {
-      setStatus((prevStatus) => ({ ...prevStatus, loadingMovies: false }));
+      setIsLoading(false);
     }
   }
 
+  function fetchWatchedMovies() {
+    setWatchedMovies(getWatchedMoviesByUserId(user.id));
+  }
+
   async function fetchGenres() {
-    setStatus((prevStatus) => ({
-      ...prevStatus,
-      loadingGenres: true,
-      errorGenres: false,
-    }));
+    setIsLoading(true);
     try {
       const fetchedGenres = await getAllGenres(language);
       setGenres(fetchedGenres);
-    } catch (err) {
-      setStatus((prevStatus) => ({ ...prevStatus, errorGenres: true }));
     } finally {
-      setStatus((prevStatus) => ({ ...prevStatus, loadingGenres: false }));
+      setIsLoading(false);
     }
   }
 
   useEffect(() => {
     fetchGenres();
     fetchMoviesResponse();
+    fetchWatchedMovies();
   }, [language]);
 
   useEffect(() => {
     fetchMoviesResponse();
-  }, [page, user?.favoriteMoviesId]);
-
-  const { loadingGenres, errorGenres, loadingMovies, errorMovies } = status;
+  }, [page]);
 
   return (
     <ViewProvider>
       <div className="w-11/12 flex flex-col gap-y-5 p-5 mx-auto mt-24 mb-12 text-white text-base font-medium bg-gray-900 rounded">
-        {loadingGenres || loadingMovies ? (
+        {isLoading ? (
           t("loading")
-        ) : errorGenres || errorMovies ? (
-          t("requestError")
         ) : (
           <>
             <GenresBlock genres={genres} />
@@ -102,7 +106,10 @@ const Home = () => {
               genres={genres}
               page={moviesResponse.page}
               movies={moviesResponse.results}
+              watchedMovies={watchedMovies}
               showAdditionalButtons={false}
+              onClickRemove={(movieId) => handleClickRemove(movieId)}
+              onClickWatched={(movieId) => handleClickWatched(movieId)}
             />
             <PaginationBlock
               page={moviesResponse.page}

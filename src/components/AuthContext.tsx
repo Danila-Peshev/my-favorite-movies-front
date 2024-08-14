@@ -9,29 +9,28 @@ import { User } from "../types/User";
 import { findByEmail } from "../repositories/UserRepository";
 
 type AuthContextType = {
-  user: User | null;
-  setUser: (user: User) => void;
+  user: User;
   isLoggedIn: () => boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 };
 
-const defaultAuthContext: AuthContextType = {
-  user: null,
-  setUser: (user: User) => {},
+const AuthContext = createContext<AuthContextType>({
+  user: {} as User,
   isLoggedIn: () => false,
   login: async () => false,
   logout: () => {},
-};
-
-const AuthContext = createContext<AuthContextType>(defaultAuthContext);
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User>({} as User);
   const [componentIsReady, setComponentIsReady] = useState(false);
 
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("user") || "null"));
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
     setComponentIsReady(true);
   }, []);
 
@@ -45,23 +44,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
-  const isLoggedIn = () => {
-    return !!user;
-  };
+  const isLoggedIn = () => Object.keys(user).length > 0;
 
   const logout = () => {
     localStorage.removeItem("user");
-    setUser(null);
+    setUser({} as User);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        setUser,
         isLoggedIn,
         login,
-        logout
+        logout,
       }}
     >
       {componentIsReady ? children : null}

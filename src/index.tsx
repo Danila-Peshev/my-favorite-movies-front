@@ -8,8 +8,6 @@ import { LanguageProvider } from "./components/switch-language/LanguageContext";
 import i18n from "./i18n";
 import router from "./routes";
 import NavBar from "./components/NavBar";
-import { ViewProvider } from "./pages/home/movies-block/switch-view/ViewContext";
-import { UserProvider } from "./components/UserContext";
 
 fillLocalStorage();
 
@@ -21,10 +19,8 @@ root.render(
   <I18nextProvider i18n={i18n}>
     <AuthProvider>
       <LanguageProvider>
-        <UserProvider>
-          <NavBar />
-          <RouterProvider router={router} />
-        </UserProvider>
+        <NavBar />
+        <RouterProvider router={router} />
       </LanguageProvider>
     </AuthProvider>
   </I18nextProvider>
