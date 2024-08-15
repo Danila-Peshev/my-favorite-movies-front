@@ -4,8 +4,7 @@ import { MoviesResponse } from "../types/movie-api-types/MoviesResponse";
 import { SimpleMovie } from "../types/movie-api-types/SimpleMovie";
 import { Language } from "../types/Language";
 import { Movie } from "../types/movie-api-types/Movie";
-
-const MAX_MOVIES_ON_PAGE = 20;
+import { MAX_MOVIES_ON_PAGE } from "../constants/movie_constants";
 
 const headers = {
   Accept: "application/json",
@@ -49,54 +48,54 @@ export async function getMoviesByFilters({
   genreIds = [],
   minCountVotes = 0,
   releaseYear = 0,
-  activePage = 1,
+  page = 1,
 }: {
   language?: Language;
   genreIds?: number[];
   minCountVotes?: number;
   releaseYear?: number;
-  activePage?: number;
+  page?: number;
 } = {}): Promise<MoviesResponse> {
   const data = await fetchFromApi("/discover/movie", {
     include_adult: false,
     include_video: false,
     with_genres: genreIds,
     language: language,
-    page: activePage,
+    page,
     sort_by: "popularity.desc",
     "vote_count.gte": minCountVotes,
     primary_release_year: releaseYear,
   });
 
-  const simpleMovies: SimpleMovie[] = data.results.map(
+  const movies: SimpleMovie[] = data.results.map(
     ({
       id,
-      backdropPath,
-      genreIds,
+      backdrop_path,
+      genre_ids,
       overview,
       popularity,
-      posterPath,
-      releaseDate,
+      poster_path,
+      release_date,
       title,
-      voteAverage,
-      voteCount
+      vote_average,
+      vote_count,
     }: Movie) => ({
       id,
-      backdropPath,
-      genreIds,
+      backdropPath: backdrop_path,
+      genreIds: genre_ids,
       overview,
       popularity,
-      posterPath,
-      releaseDate,
+      posterPath: poster_path,
+      releaseDate: release_date,
       title,
-      voteAverage,
-      voteCount
+      voteAverage: vote_average,
+      voteCount: vote_count,
     })
   );
 
   return {
     page: data.page,
-    results: simpleMovies,
+    results: movies,
     totalPages: data.total_pages,
     totalResult: data.total_results,
   };

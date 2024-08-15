@@ -1,9 +1,17 @@
 {
-    "welcome": "Welcome to \"My Favorite Movies\", {{user}}!",
-    "logout": "Logout",
-    "login": "Login",
-    "inputEmail": "User name or e-mail",
-    "inputPassword": "Password",
-    "inputErrorEmpty": "Field should not be empty",
-    "inputErrorFailed": "Incorrect email or password"
+  "welcome": "Hello, {{user}}",
+  "title": "My Favorite Movies",
+  "logout": "Logout",
+  "login": "Login",
+  "inputEmail": "User name or e-mail",
+  "inputPassword": "Password",
+  "inputErrorEmpty": "Field should not be empty",
+  "inputErrorFailed": "Incorrect email or password",
+  "selectYouFavoriteGenres": "Select your favorite genres:",
+  "addMoviesToYourFavorite": "Add movies to your favorite:",
+  "yourFavoriteMovies": "Your favorite movies:",
+  "loading": "loading...",
+  "requestError": "Something's wrong.",
+  "add": "ADD",
+  "NotSingleMovieWasFound": "Not a single movie was found"
 }
