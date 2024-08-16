@@ -14,9 +14,12 @@ import { MAX_TOTAL_PAGES } from "../../constants/movie_constants";
 import PaginationBlock from "./movies-block/PaginationBlock";
 import { useAuth } from "../../components/AuthContext";
 import {
+  addFavoriteGenreByUserId,
   addWatchedMovieByUserId,
+  getFavoriteGenresByUserId,
   getFavoriteMoviesByUserId,
   getWatchedMoviesByUserId,
+  removeFavoriteGenreByUserId,
   removeFavoriteMovieByUserId,
   removeWatchedMovieByUserId,
 } from "../../services/UserDataService";
@@ -39,9 +42,11 @@ const Home = () => {
   const [page, setPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
+  const [favoriteGenresId, setFavoriteGenresId] = useState<number[]>([]);
 
   useEffect(() => {
     fetchGenres();
+    fetchFavoriteGenres();
     fetchMoviesResponse();
     fetchWatchedMovies();
   }, [language]);
@@ -67,6 +72,25 @@ const Home = () => {
   const handleClickRemove = (movieId: number) => {
     removeFavoriteMovieByUserId(user.id, movieId);
     fetchMoviesResponse();
+  };
+
+  function fetchFavoriteGenres() {
+    if (user) {
+      setFavoriteGenresId(getFavoriteGenresByUserId(user.id));
+    } else {
+      setFavoriteGenresId([]);
+    }
+  }
+
+  const handleClickOnGenre = (genreId: number) => {
+    if (favoriteGenresId.includes(genreId)) {
+      removeFavoriteGenreByUserId(user.id, genreId);
+    } else {
+      addFavoriteGenreByUserId(user.id, genreId);
+    }
+
+    const updatedFavoriteGenres = getFavoriteGenresByUserId(user.id);
+    setFavoriteGenresId(updatedFavoriteGenres);
   };
 
   const totalPages = Math.min(
@@ -117,13 +141,13 @@ const Home = () => {
           t("loading")
         ) : (
           <>
-            <GenresBlock genres={genres} />
+            <GenresBlock selectedGenres={favoriteGenresId} clickOnGenre={handleClickOnGenre} genres={genres} />
             <MoviesBlock
               genres={genres}
               page={moviesResponse.page}
               movies={moviesResponse.results}
               watchedMovies={watchedMovies}
-              showAdditionalButtons={false}
+              showWatchedAndRemoveButtons={true}
               onClickRemove={(movieId) => handleClickRemove(movieId)}
               onClickWatched={(movieId) => handleClickWatched(movieId)}
             />
