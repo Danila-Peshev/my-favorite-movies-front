@@ -13,5 +13,8 @@
   "loading": "loading...",
   "requestError": "Something's wrong.",
   "add": "ADD",
-  "NotSingleMovieWasFound": "Not a single movie was found"
+  "notSingleMovieWasFound": "Not a single movie was found",
+  "popularity": "Popularity",
+  "releaseYear": "Release year",
+  "saveIt": "Save it"
 }

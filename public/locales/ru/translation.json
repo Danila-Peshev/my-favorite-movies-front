@@ -13,5 +13,8 @@
   "loading": "загрузка...",
   "requestError": "Что-то пошло не так.",
   "add": "ДОБАВИТЬ",
-  "NotSingleMovieWasFound": "Не найдено ни одного фильма"
+  "notSingleMovieWasFound": "Не найдено ни одного фильма",
+  "popularity": "Популярность",
+  "releaseYear": "Год выпуска",
+  "saveIt": "Сохранить"
 }
