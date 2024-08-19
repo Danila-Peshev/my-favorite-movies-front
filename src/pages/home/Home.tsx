@@ -147,7 +147,7 @@ const Home = () => {
               page={moviesResponse.page}
               movies={moviesResponse.results}
               watchedMovies={watchedMovies}
-              showWatchedAndRemoveButtons={true}
+              showWatchedAndRemoveButtons
               onClickRemove={(movieId) => handleClickRemove(movieId)}
               onClickWatched={(movieId) => handleClickWatched(movieId)}
             />
