@@ -47,7 +47,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const responseMutation = await loginMutation({variables: {email, password}})
     localStorage.setItem("token", responseMutation.data.login.token)
     const responseQuery = await getUserQuery()
-    console.log(responseQuery)
     if (!responseQuery.error && responseQuery.data) {
       setUser({id: responseQuery.data.getUser.id, email: responseQuery.data.getUser.email});
       return true;
