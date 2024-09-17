@@ -6,7 +6,9 @@ import {
   useEffect,
 } from "react";
 import { User } from "../types/User";
-import { findByEmail } from "../repositories/UserRepository";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { LOGIN } from "../queries-mutations/mutations";
+import { GET_USER } from "../queries-mutations/queries";
 
 type AuthContextType = {
   user: User | null;
@@ -27,20 +29,30 @@ const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [componentIsReady, setComponentIsReady] = useState(false);
+  const [loginMutation] = useMutation(LOGIN);
+  const {data, loading, error} = useQuery(GET_USER)
+  const [getUserQuery] = useLazyQuery(GET_USER)
+
 
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("user") || "null"));
-    setComponentIsReady(true);
-  }, []);
+    if (!loading && !error && data) {
+      setUser({id: data.getUser.id, email: data.getUser.email});
+      setComponentIsReady(true);
+    } else if (error) {
+      setComponentIsReady(true);
+    }
+  }, [data, error, loading]);
 
   const login = async (email: string, password: string) => {
-    const optinalUser = await findByEmail(email);
-    if (optinalUser && password === optinalUser.password) {
-      localStorage.setItem("user", JSON.stringify(optinalUser));
-      setUser(optinalUser);
+    const responseMutation = await loginMutation({variables: {email, password}})
+    localStorage.setItem("token", responseMutation.data.login.token)
+    const responseQuery = await getUserQuery()
+    console.log(responseQuery)
+    if (!responseQuery.error && responseQuery.data) {
+      setUser({id: responseQuery.data.getUser.id, email: responseQuery.data.getUser.email});
       return true;
     }
-    return false;
+    return false
   };
 
   const isLoggedIn = () => {
@@ -48,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     setUser(null);
   };
 

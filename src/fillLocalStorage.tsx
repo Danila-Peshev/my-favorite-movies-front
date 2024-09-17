@@ -4,12 +4,10 @@ const USERS: User[] = [
   {
     id: 1,
     email: "ivan@mail.ru",
-    password: "ivan",
   },
   {
     id: 2,
     email: "maks@mail.ru",
-    password: "maks",
   },
 ];
 
