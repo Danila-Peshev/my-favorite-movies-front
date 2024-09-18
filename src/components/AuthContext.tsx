@@ -6,9 +6,7 @@ import {
   useEffect,
 } from "react";
 import { User } from "../types/User";
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { LOGIN } from "../queries-mutations/mutations";
-import { GET_USER } from "../queries-mutations/queries";
+import useLogin from "../gql-hooks/useLogin";
 
 type AuthContextType = {
   user: User | null;
@@ -29,29 +27,33 @@ const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [componentIsReady, setComponentIsReady] = useState(false);
-  const [loginMutation] = useMutation(LOGIN);
-  const {data, loading, error} = useQuery(GET_USER)
-  const [getUserQuery] = useLazyQuery(GET_USER)
-
+  const {
+    loginMutation,
+    dataGetUser,
+    isLoadingGetUser,
+    errorGetUser,
+    refetchGetUser,
+  } = useLogin();
 
   useEffect(() => {
-    if (!loading && !error && data) {
-      setUser({id: data.getUser.id, email: data.getUser.email});
-      setComponentIsReady(true);
-    } else if (error) {
+    if (!isLoadingGetUser && !errorGetUser && dataGetUser) {
+      setUser({ id: dataGetUser.getUser.id, email: dataGetUser.getUser.email });
       setComponentIsReady(true);
     }
-  }, [data, error, loading]);
+    setComponentIsReady(true);
+  }, [dataGetUser, errorGetUser, isLoadingGetUser]);
 
   const login = async (email: string, password: string) => {
-    const responseMutation = await loginMutation({variables: {email, password}})
-    localStorage.setItem("token", responseMutation.data.login.token)
-    const responseQuery = await getUserQuery()
-    if (!responseQuery.error && responseQuery.data) {
-      setUser({id: responseQuery.data.getUser.id, email: responseQuery.data.getUser.email});
+    try {
+      const responseMutation = await loginMutation({
+        variables: { email, password },
+      });
+      localStorage.setItem("token", responseMutation.data.login.token);
+      await refetchGetUser();
       return true;
+    } catch {
+      return false;
     }
-    return false
   };
 
   const isLoggedIn = () => {
