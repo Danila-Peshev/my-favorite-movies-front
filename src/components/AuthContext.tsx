@@ -7,6 +7,7 @@ import {
 } from "react";
 import { User } from "../types/User";
 import useLogin from "../gql-hooks/useLogin";
+import useGetUser from "../gql-hooks/useGetUser";
 
 type AuthContextType = {
   user: User | null;
@@ -27,13 +28,9 @@ const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [componentIsReady, setComponentIsReady] = useState(false);
-  const {
-    loginMutation,
-    dataGetUser,
-    isLoadingGetUser,
-    errorGetUser,
-    refetchGetUser,
-  } = useLogin();
+  const { loginMutation } = useLogin();
+  const { dataGetUser, isLoadingGetUser, errorGetUser, refetchGetUser } =
+    useGetUser();
 
   useEffect(() => {
     if (!isLoadingGetUser && !errorGetUser && dataGetUser) {
