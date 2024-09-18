@@ -8,7 +8,8 @@ import { LanguageProvider } from "./components/switch-language/LanguageContext";
 import i18n from "./i18n";
 import router from "./routes";
 import NavBar from "./components/NavBar";
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { ApolloClient, ApolloProvider, createHttpLink, InMemoryCache } from "@apollo/client";
+import {setContext} from "@apollo/client/link/context"
 
 fillLocalStorage();
 
@@ -16,8 +17,22 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
-const client = new ApolloClient({
+const httpLink = createHttpLink({
   uri: process.env.REACT_APP_GQL_SERVER_URI,
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('token');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    }
+  }
+});
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
 

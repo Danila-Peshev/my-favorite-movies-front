@@ -6,7 +6,8 @@ import {
   useEffect,
 } from "react";
 import { User } from "../types/User";
-import { findByEmail } from "../repositories/UserRepository";
+import useLogin from "../gql-hooks/useLogin";
+import useGetUser from "../gql-hooks/useGetUser";
 
 type AuthContextType = {
   user: User | null;
@@ -27,20 +28,29 @@ const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [componentIsReady, setComponentIsReady] = useState(false);
+  const { loginMutation } = useLogin();
+  const { dataGetUser, isLoadingGetUser, errorGetUser, refetchGetUser } =
+    useGetUser();
 
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("user") || "null"));
+    if (!isLoadingGetUser && !errorGetUser && dataGetUser) {
+      setUser({ id: dataGetUser.getUser.id, email: dataGetUser.getUser.email });
+      setComponentIsReady(true);
+    }
     setComponentIsReady(true);
-  }, []);
+  }, [dataGetUser, errorGetUser, isLoadingGetUser]);
 
   const login = async (email: string, password: string) => {
-    const optinalUser = await findByEmail(email);
-    if (optinalUser && password === optinalUser.password) {
-      localStorage.setItem("user", JSON.stringify(optinalUser));
-      setUser(optinalUser);
+    try {
+      const responseMutation = await loginMutation({
+        variables: { email, password },
+      });
+      localStorage.setItem("token", responseMutation.data.login.token);
+      await refetchGetUser();
       return true;
+    } catch {
+      return false;
     }
-    return false;
   };
 
   const isLoggedIn = () => {
@@ -48,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     setUser(null);
   };
 
