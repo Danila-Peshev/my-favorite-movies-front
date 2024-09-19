@@ -36,8 +36,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!isLoadingGetUser && !errorGetUser && dataGetUser) {
       setUser({ id: dataGetUser.getUser.id, email: dataGetUser.getUser.email });
       setComponentIsReady(true);
+    } else if (errorGetUser) {
+      setComponentIsReady(true);
     }
-    setComponentIsReady(true);
   }, [dataGetUser, errorGetUser, isLoadingGetUser]);
 
   const login = async (email: string, password: string) => {

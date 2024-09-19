@@ -13,16 +13,11 @@ import { MoviesResponse } from "../../types/movie-api-types/MoviesResponse";
 import { MAX_TOTAL_PAGES } from "../../constants/movie_constants";
 import PaginationBlock from "./movies-block/PaginationBlock";
 import { useAuth } from "../../components/AuthContext";
-import {
-  addFavoriteGenreByUserId,
-  addWatchedMovieByUserId,
-  getFavoriteGenresByUserId,
-  getFavoriteMoviesByUserId,
-  getWatchedMoviesByUserId,
-  removeFavoriteGenreByUserId,
-  removeFavoriteMovieByUserId,
-  removeWatchedMovieByUserId,
-} from "../../services/UserDataService";
+import useToggleUserGenre from "../../gql-hooks/useToggleUserGenre";
+import useToggleUserMovie from "../../gql-hooks/useToggleUserMovie";
+import useToggleWatchMovie from "../../gql-hooks/useToggleWatchMovie";
+import useUserGenres from "../../gql-hooks/useUserGenres";
+import useUserMovies from "../../gql-hooks/useUserMovies";
 
 const defaultMoviesResponse: MoviesResponse = {
   page: 1,
@@ -37,60 +32,63 @@ const Home = () => {
   const [moviesResponse, setMoviesResponse] = useState<MoviesResponse>(
     defaultMoviesResponse
   );
-  const [watchedMovies, setWatchedMovies] = useState<number[]>([]);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [page, setPage] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState(true);
   const { t } = useTranslation();
-  const [favoriteGenresId, setFavoriteGenresId] = useState<number[]>([]);
+  const { toggleUserGenre, errorToggleUserGenre } = useToggleUserGenre();
+  const { toggleUserMovie, errorToggleUserMovie } = useToggleUserMovie();
+  const { toggleWatchMovie, errorToggleWatchMovie } = useToggleWatchMovie();
+  const {
+    userGenres,
+    isLoadingUserGenres,
+    errorUserGenres,
+    refetchUserGenres,
+  } = useUserGenres();
+  const {
+    userMovies,
+    isLoadingUserMovies,
+    errorUserMovies,
+    refetchUserMovies,
+  } = useUserMovies();
 
   useEffect(() => {
     fetchGenres();
-    fetchFavoriteGenres();
     fetchMoviesResponse();
-    fetchWatchedMovies();
   }, [language]);
 
   useEffect(() => {
     fetchMoviesResponse();
-  }, [page]);
+  }, [page, isLoadingUserMovies]);
+
+  if (
+    errorUserGenres ||
+    errorUserMovies ||
+    errorToggleUserGenre ||
+    errorToggleUserMovie ||
+    errorToggleWatchMovie
+  ) {
+    logout();
+  }
 
   if (!user) {
     return null;
   }
 
-  const handleClickWatched = (movieId: number) => {
-    if (watchedMovies.includes(movieId)) {
-      removeWatchedMovieByUserId(user.id, movieId);
-    } else {
-      addWatchedMovieByUserId(user.id, movieId);
-    }
-    fetchWatchedMovies();
+  const handleClickWatched = async (movieId: number) => {
+    await toggleWatchMovie({ variables: { movieId } });
+    await refetchUserMovies();
     fetchMoviesResponse();
   };
 
-  const handleClickRemove = (movieId: number) => {
-    removeFavoriteMovieByUserId(user.id, movieId);
+  const handleClickRemove = async (movieId: number) => {
+    await toggleUserMovie({ variables: { movieId } });
+    await refetchUserMovies();
     fetchMoviesResponse();
   };
 
-  function fetchFavoriteGenres() {
-    if (user) {
-      setFavoriteGenresId(getFavoriteGenresByUserId(user.id));
-    } else {
-      setFavoriteGenresId([]);
-    }
-  }
-
-  const handleClickOnGenre = (genreId: number) => {
-    if (favoriteGenresId.includes(genreId)) {
-      removeFavoriteGenreByUserId(user.id, genreId);
-    } else {
-      addFavoriteGenreByUserId(user.id, genreId);
-    }
-
-    const updatedFavoriteGenres = getFavoriteGenresByUserId(user.id);
-    setFavoriteGenresId(updatedFavoriteGenres);
+  const handleClickOnGenre = async (genreId: number) => {
+    await toggleUserGenre({ variables: { genreId } });
+    await refetchUserGenres();
   };
 
   const totalPages = Math.min(
@@ -99,54 +97,44 @@ const Home = () => {
   );
 
   async function fetchMoviesResponse() {
-    setIsLoading(true);
-    try {
-      if (user) {
-        const movies = await getFavoriteMoviesByIds({
-          ids: getFavoriteMoviesByUserId(user.id),
-          language,
-          page,
-        });
-        setMoviesResponse(movies);
-      } else {
-        setMoviesResponse(defaultMoviesResponse);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  function fetchWatchedMovies() {
-    if (user) {
-      setWatchedMovies(getWatchedMoviesByUserId(user.id));
-    } else {
-      setWatchedMovies([]);
+    if (user && !isLoadingUserMovies) {
+      const movies = await getFavoriteMoviesByIds({
+        ids: userMovies.getUserMovies.map(
+          (movie: { movieId: number }) => movie.movieId
+        ),
+        language,
+        page,
+      });
+      setMoviesResponse(movies);
     }
   }
 
   async function fetchGenres() {
-    setIsLoading(true);
-    try {
-      const fetchedGenres = await getAllGenres(language);
-      setGenres(fetchedGenres);
-    } finally {
-      setIsLoading(false);
-    }
+    const fetchedGenres = await getAllGenres(language);
+    setGenres(fetchedGenres);
   }
 
   return (
     <ViewProvider>
       <div className="w-11/12 flex flex-col gap-y-5 p-5 mx-auto mt-24 mb-12 text-white text-base font-medium bg-gray-900 rounded">
-        {isLoading ? (
+        {isLoadingUserGenres || isLoadingUserMovies ? (
           t("loading")
         ) : (
           <>
-            <GenresBlock selectedGenres={favoriteGenresId} clickOnGenre={handleClickOnGenre} genres={genres} />
+            <GenresBlock
+              selectedGenres={userGenres?.getUserGenres.map(
+                (genre: { genreId: number }) => genre.genreId
+              )}
+              clickOnGenre={handleClickOnGenre}
+              genres={genres}
+            />
             <MoviesBlock
               genres={genres}
               page={moviesResponse.page}
               movies={moviesResponse.results}
-              watchedMovies={watchedMovies}
+              watchedMovies={userMovies.getUserMovies
+                .filter((movie: { isWatched: boolean }) => movie.isWatched)
+                .map((movie: { movieId: number }) => movie.movieId)}
               showWatchedAndRemoveButtons
               onClickRemove={(movieId) => handleClickRemove(movieId)}
               onClickWatched={(movieId) => handleClickWatched(movieId)}

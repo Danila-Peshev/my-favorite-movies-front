@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { FC } from "react";
 import { Genre } from "../../types/movie-api-types/Genre";
 import { useTranslation } from "react-i18next";
 
@@ -8,7 +8,11 @@ interface GenresBlockProps {
   clickOnGenre: (genreId: number) => void;
 }
 
-const GenresBlock: FC<GenresBlockProps> = ({ genres, selectedGenres=[], clickOnGenre }) => {
+const GenresBlock: FC<GenresBlockProps> = ({
+  genres,
+  selectedGenres = [],
+  clickOnGenre,
+}) => {
   const { t } = useTranslation();
 
   return (

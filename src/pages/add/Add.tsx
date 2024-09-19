@@ -1,11 +1,4 @@
 import { useEffect, useState } from "react";
-import {
-  addFavoriteMovieByUserId,
-  getFavoriteGenresByUserId,
-  getFavoriteMoviesByUserId,
-  getWatchedMoviesByUserId,
-  removeFavoriteMovieByUserId,
-} from "../../services/UserDataService";
 import { useAuth } from "../../components/AuthContext";
 import { MoviesResponse } from "../../types/movie-api-types/MoviesResponse";
 import { useLanguage } from "../../components/switch-language/LanguageContext";
@@ -21,7 +14,11 @@ import {
   MIN_POPULARITY,
   MAX_POPULARITY,
   AVAILABLE_YEARS,
+  MAX_RELEASE_YEAR,
 } from "../../constants/filter_constants";
+import useToggleUserMovie from "../../gql-hooks/useToggleUserMovie";
+import useUserGenres from "../../gql-hooks/useUserGenres";
+import useUserMovies from "../../gql-hooks/useUserMovies";
 
 const defaultMoviesResponse: MoviesResponse = {
   page: 1,
@@ -37,37 +34,44 @@ type FiltersType = {
 };
 
 const Add = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [filters, setFilters] = useState<FiltersType>({
-    genresId: user ? getFavoriteGenresByUserId(user.id) : [],
+    genresId: [],
     popularity: 0,
-    releaseYear: 2024,
+    releaseYear: MAX_RELEASE_YEAR,
   });
   const [moviesResponse, setMoviesResponse] = useState(defaultMoviesResponse);
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [watchedMovies, setWatchedMovies] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
+  const { toggleUserMovie, errorToggleUserMovie } = useToggleUserMovie();
+  const { userGenres, isLoadingUserGenres, errorUserGenres } = useUserGenres();
+  const {
+    userMovies,
+    isLoadingUserMovies,
+    errorUserMovies,
+    refetchUserMovies,
+  } = useUserMovies();
 
   const totalPages = Math.min(moviesResponse.totalPages, MAX_TOTAL_PAGES);
 
   const handleGenreToggle = (genreId: number) => {
-    setFilters(prevFilters => ({
+    setFilters((prevFilters) => ({
       ...prevFilters,
       genresId: prevFilters.genresId.includes(genreId)
-        ? prevFilters.genresId.filter(id => id !== genreId)
+        ? prevFilters.genresId.filter((id) => id !== genreId)
         : [...prevFilters.genresId, genreId],
     }));
   };
 
   const handleRangeChange = (popularity: number) => {
-    setFilters(prevFilters => ({ ...prevFilters, popularity }));
+    setFilters((prevFilters) => ({ ...prevFilters, popularity }));
   };
 
   const handleYearChange = (releaseYear: number) => {
-    setFilters(prevFilters => ({ ...prevFilters, releaseYear }));
+    setFilters((prevFilters) => ({ ...prevFilters, releaseYear }));
   };
 
   const fetchGenres = async () => {
@@ -78,11 +82,6 @@ const Add = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const fetchWatchedMovies = () => {
-    const watched = user ? getWatchedMoviesByUserId(user.id) : [];
-    setWatchedMovies(watched);
   };
 
   const fetchMovies = async () => {
@@ -106,8 +105,18 @@ const Add = () => {
   };
 
   useEffect(() => {
+    if (userGenres && !errorUserGenres) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        genresId: userGenres?.getUserGenres.map(
+          (genre: { genreId: number }) => genre.genreId
+        ),
+      }));
+    }
+  }, [isLoadingUserGenres]);
+
+  useEffect(() => {
     fetchGenres();
-    fetchWatchedMovies();
     fetchMovies();
   }, [language]);
 
@@ -115,14 +124,15 @@ const Add = () => {
     fetchMovies();
   }, [page, filters.genresId, filters.releaseYear]);
 
+  if (errorUserGenres || errorUserMovies || errorToggleUserMovie) {
+    logout();
+  }
+
   if (!user) return null;
 
-  const handleSaveMovieToggle = (movieId: number) => {
-    if (getFavoriteMoviesByUserId(user.id).includes(movieId)) {
-      removeFavoriteMovieByUserId(user.id, movieId);
-    } else {
-      addFavoriteMovieByUserId(user.id, movieId);
-    }
+  const handleSaveMovieToggle = async (movieId: number) => {
+    await toggleUserMovie({ variables: { movieId } });
+    await refetchUserMovies();
     fetchMovies();
   };
 
@@ -134,7 +144,9 @@ const Add = () => {
           clickOnGenre={handleGenreToggle}
           genres={genres}
         />
-        <span>{t("popularity")}: {filters.popularity}</span>
+        <span>
+          {t("popularity")}: {filters.popularity}
+        </span>
         <input
           type="range"
           min={MIN_POPULARITY}
@@ -144,7 +156,9 @@ const Add = () => {
           onMouseUp={fetchMovies}
           onTouchEnd={fetchMovies}
         />
-        <span>{t("releaseYear")}: {filters.releaseYear}</span>
+        <span>
+          {t("releaseYear")}: {filters.releaseYear}
+        </span>
         <select
           value={filters.releaseYear}
           onChange={(e) => handleYearChange(Number(e.target.value))}
@@ -156,7 +170,7 @@ const Add = () => {
             </option>
           ))}
         </select>
-        {isLoading ? (
+        {isLoadingUserGenres || isLoadingUserMovies || isLoading ? (
           t("loading")
         ) : (
           <>
@@ -164,7 +178,9 @@ const Add = () => {
               genres={genres}
               page={moviesResponse.page}
               movies={moviesResponse.results}
-              watchedMovies={watchedMovies}
+              watchedMovies={userMovies.getUserMovies
+                .filter((movie: { isWatched: boolean }) => movie.isWatched)
+                .map((movie: { movieId: number }) => movie.movieId)}
               showSaveItButton={true}
               onClickSaveIt={handleSaveMovieToggle}
             />

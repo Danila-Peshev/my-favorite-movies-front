@@ -7,3 +7,27 @@ export const LOGIN = gql`
     }
   }
 `;
+
+export const TOGGLE_USER_GENRE = gql`
+  mutation toggleUserGenre($genreId: Int!) {
+    toggleUserGenre(genreId: $genreId) {
+      success
+    }
+  }
+`;
+
+export const TOGGLE_USER_MOVIE = gql`
+  mutation toggleUserMovie($movieId: Int!) {
+    toggleUserMovie(movieId: $movieId) {
+      success
+    }
+  }
+`;
+
+export const TOGGLE_WATCH_MOVIE = gql`
+  mutation toggleWatchMovie($movieId: Int!) {
+    toggleWatchMovie(movieId: $movieId) {
+      isWatched
+    }
+  }
+`;

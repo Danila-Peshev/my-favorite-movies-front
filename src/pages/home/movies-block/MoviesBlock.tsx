@@ -7,8 +7,9 @@ import { useTranslation } from "react-i18next";
 import { SimpleMovie } from "../../../types/movie-api-types/SimpleMovie";
 import OneMovie from "./OneMovie";
 import { Link } from "react-router-dom";
-import { getFavoriteMoviesByUserId } from "../../../services/UserDataService";
-import { useAuth } from "../../../components/AuthContext";
+import { useQuery } from "@apollo/client";
+import { GET_USER_MOVIES } from "../../../queries-mutations/queries";
+import useUserMovies from "../../../gql-hooks/useUserMovies";
 
 interface MoviesBlockProps {
   genres: Genre[];
@@ -31,14 +32,14 @@ const MoviesBlock: FC<MoviesBlockProps> = ({
   showSaveItButton = false,
   onClickWatched = (): void => {},
   onClickRemove = (): void => {},
-  onClickSaveIt = (): void => {}
+  onClickSaveIt = (): void => {},
 }) => {
   const { isBlockView } = useView();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { userMovies, isLoadingUserMovies } = useUserMovies();
 
-  if (!user) {
-    return null;
+  if (isLoadingUserMovies) {
+    return <span>Loading...</span>;
   }
 
   return (
@@ -52,9 +53,9 @@ const MoviesBlock: FC<MoviesBlockProps> = ({
         <div className="flex space-x-2">
           {showWatchedAndRemoveButtons && (
             <Link to="/add">
-            <button className="text-white bg-blue-800 rounded-sm px-4 py-1">
-              {t("add")}
-            </button>
+              <button className="text-white bg-blue-800 rounded-sm px-4 py-1">
+                {t("add")}
+              </button>
             </Link>
           )}
           <ViewSwitcher />
@@ -67,23 +68,26 @@ const MoviesBlock: FC<MoviesBlockProps> = ({
             : "relative grid grid-flow-row gap-y-5 mt-5"
         }
       >
-        {movies.length === 0 ? t("notSingleMovieWasFound") : 
-        movies.map((simpleMovie, index) => (
-          <OneMovie
-            key={simpleMovie.id}
-            movie={simpleMovie}
-            movieNumber={(page - 1) * MAX_MOVIES_ON_PAGE + index + 1}
-            genres={genres}
-            isWatched={watchedMovies.includes(simpleMovie.id)}
-            isSaved={getFavoriteMoviesByUserId(user.id).includes(simpleMovie.id)}
-            showWatchedAndRemoveButtons={showWatchedAndRemoveButtons}
-            showSaveItButton={showSaveItButton}
-            isBlockView={isBlockView}
-            onClickWatched={onClickWatched}
-            onClickRemove={onClickRemove}
-            onClickSaveIt={onClickSaveIt}
-          />
-        ))}
+        {movies.length === 0
+          ? t("notSingleMovieWasFound")
+          : movies.map((simpleMovie, index) => (
+              <OneMovie
+                key={simpleMovie.id}
+                movie={simpleMovie}
+                movieNumber={(page - 1) * MAX_MOVIES_ON_PAGE + index + 1}
+                genres={genres}
+                isWatched={watchedMovies.includes(simpleMovie.id)}
+                isSaved={userMovies?.getUserMovies
+                  ?.map((movie: { movieId: number }) => movie.movieId)
+                  .includes(simpleMovie.id)}
+                showWatchedAndRemoveButtons={showWatchedAndRemoveButtons}
+                showSaveItButton={showSaveItButton}
+                isBlockView={isBlockView}
+                onClickWatched={onClickWatched}
+                onClickRemove={onClickRemove}
+                onClickSaveIt={onClickSaveIt}
+              />
+            ))}
       </div>
     </div>
   );
