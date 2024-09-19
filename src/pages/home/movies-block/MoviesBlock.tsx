@@ -7,8 +7,6 @@ import { useTranslation } from "react-i18next";
 import { SimpleMovie } from "../../../types/movie-api-types/SimpleMovie";
 import OneMovie from "./OneMovie";
 import { Link } from "react-router-dom";
-import { useQuery } from "@apollo/client";
-import { GET_USER_MOVIES } from "../../../queries-mutations/queries";
 import useUserMovies from "../../../gql-hooks/useUserMovies";
 
 interface MoviesBlockProps {

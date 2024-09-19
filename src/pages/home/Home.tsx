@@ -77,13 +77,11 @@ const Home = () => {
   const handleClickWatched = async (movieId: number) => {
     await toggleWatchMovie({ variables: { movieId } });
     await refetchUserMovies();
-    fetchMoviesResponse();
   };
 
   const handleClickRemove = async (movieId: number) => {
     await toggleUserMovie({ variables: { movieId } });
     await refetchUserMovies();
-    fetchMoviesResponse();
   };
 
   const handleClickOnGenre = async (genreId: number) => {
