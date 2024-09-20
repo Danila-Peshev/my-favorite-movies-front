@@ -46,6 +46,7 @@ const Home = () => {
   } = useUserGenres();
   const {
     userMovies,
+    watchedUserMovies,
     isLoadingUserMovies,
     errorUserMovies,
     refetchUserMovies,
@@ -76,17 +77,17 @@ const Home = () => {
 
   const handleClickWatched = async (movieId: number) => {
     await toggleWatchMovie({ variables: { movieId } });
-    await refetchUserMovies();
+    refetchUserMovies();
   };
 
   const handleClickRemove = async (movieId: number) => {
     await toggleUserMovie({ variables: { movieId } });
-    await refetchUserMovies();
+    refetchUserMovies();
   };
 
   const handleClickOnGenre = async (genreId: number) => {
     await toggleUserGenre({ variables: { genreId } });
-    await refetchUserGenres();
+    refetchUserGenres();
   };
 
   const totalPages = Math.min(
@@ -97,9 +98,7 @@ const Home = () => {
   async function fetchMoviesResponse() {
     if (user && !isLoadingUserMovies) {
       const movies = await getFavoriteMoviesByIds({
-        ids: userMovies.getUserMovies.map(
-          (movie: { movieId: number }) => movie.movieId
-        ),
+        ids: userMovies,
         language,
         page,
       });
@@ -120,9 +119,7 @@ const Home = () => {
         ) : (
           <>
             <GenresBlock
-              selectedGenres={userGenres?.getUserGenres.map(
-                (genre: { genreId: number }) => genre.genreId
-              )}
+              selectedGenres={userGenres}
               clickOnGenre={handleClickOnGenre}
               genres={genres}
             />
@@ -130,9 +127,7 @@ const Home = () => {
               genres={genres}
               page={moviesResponse.page}
               movies={moviesResponse.results}
-              watchedMovies={userMovies.getUserMovies
-                .filter((movie: { isWatched: boolean }) => movie.isWatched)
-                .map((movie: { movieId: number }) => movie.movieId)}
+              watchedMovies={watchedUserMovies}
               showWatchedAndRemoveButtons
               onClickRemove={(movieId) => handleClickRemove(movieId)}
               onClickWatched={(movieId) => handleClickWatched(movieId)}

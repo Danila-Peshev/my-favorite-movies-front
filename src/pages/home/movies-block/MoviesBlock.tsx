@@ -66,18 +66,15 @@ const MoviesBlock: FC<MoviesBlockProps> = ({
             : "relative grid grid-flow-row gap-y-5 mt-5"
         }
       >
-        {movies.length === 0
-          ? t("notSingleMovieWasFound")
-          : movies.map((simpleMovie, index) => (
+        {movies.length
+          ? movies.map((simpleMovie, index) => (
               <OneMovie
                 key={simpleMovie.id}
                 movie={simpleMovie}
                 movieNumber={(page - 1) * MAX_MOVIES_ON_PAGE + index + 1}
                 genres={genres}
                 isWatched={watchedMovies.includes(simpleMovie.id)}
-                isSaved={userMovies?.getUserMovies
-                  ?.map((movie: { movieId: number }) => movie.movieId)
-                  .includes(simpleMovie.id)}
+                isSaved={userMovies.includes(simpleMovie.id)}
                 showWatchedAndRemoveButtons={showWatchedAndRemoveButtons}
                 showSaveItButton={showSaveItButton}
                 isBlockView={isBlockView}
@@ -85,7 +82,8 @@ const MoviesBlock: FC<MoviesBlockProps> = ({
                 onClickRemove={onClickRemove}
                 onClickSaveIt={onClickSaveIt}
               />
-            ))}
+            ))
+          : t("notSingleMovieWasFound")}
       </div>
     </div>
   );

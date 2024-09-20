@@ -49,7 +49,7 @@ const Add = () => {
   const { toggleUserMovie, errorToggleUserMovie } = useToggleUserMovie();
   const { userGenres, isLoadingUserGenres, errorUserGenres } = useUserGenres();
   const {
-    userMovies,
+    watchedUserMovies,
     isLoadingUserMovies,
     errorUserMovies,
     refetchUserMovies,
@@ -108,9 +108,7 @@ const Add = () => {
     if (userGenres && !errorUserGenres) {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        genresId: userGenres?.getUserGenres.map(
-          (genre: { genreId: number }) => genre.genreId
-        ),
+        genresId: userGenres,
       }));
     }
   }, [isLoadingUserGenres]);
@@ -132,7 +130,7 @@ const Add = () => {
 
   const handleSaveMovieToggle = async (movieId: number) => {
     await toggleUserMovie({ variables: { movieId } });
-    await refetchUserMovies();
+    refetchUserMovies();
     fetchMovies();
   };
 
@@ -178,9 +176,7 @@ const Add = () => {
               genres={genres}
               page={moviesResponse.page}
               movies={moviesResponse.results}
-              watchedMovies={userMovies.getUserMovies
-                .filter((movie: { isWatched: boolean }) => movie.isWatched)
-                .map((movie: { movieId: number }) => movie.movieId)}
+              watchedMovies={watchedUserMovies}
               showSaveItButton={true}
               onClickSaveIt={handleSaveMovieToggle}
             />
