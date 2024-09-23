@@ -55,7 +55,6 @@ const Home = () => {
 
   useEffect(() => {
     fetchMoviesResponse();
-    console.log("bass")
   }, [page, isLoadingUserMovies]);
 
   if (!user) {
