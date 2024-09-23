@@ -24,7 +24,7 @@ const useGetMoviesByFilters = (
     notifyOnNetworkStatusChange: true,
   });
 
-  const moviesResponse = dataMoviesByFilters.getMoviesByFilters;
+  const moviesResponse = dataMoviesByFilters?.getMoviesByFilters;
   return {
     moviesResponse,
     isLoadingMoviesByFilters,

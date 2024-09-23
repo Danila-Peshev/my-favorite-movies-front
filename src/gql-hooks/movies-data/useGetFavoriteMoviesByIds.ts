@@ -22,7 +22,7 @@ const useGetFavoriteMoviesByIds = (
     notifyOnNetworkStatusChange: true,
   });
 
-  const moviesResponse = dataFavoriteMoviesByIds.getFavoriteMoviesByIds;
+  const moviesResponse = dataFavoriteMoviesByIds?.getFavoriteMoviesByIds;
 
   return {
     moviesResponse,
