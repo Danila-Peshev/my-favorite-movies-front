@@ -8,3 +8,20 @@ export const GET_USER = gql`
     }
   }
 `;
+
+export const GET_USER_MOVIES = gql`
+  query getUserMovies {
+    getUserMovies {
+      movieId
+      isWatched
+    }
+  }
+`;
+
+export const GET_USER_GENRES = gql`
+  query getUserGenres {
+    getUserGenres {
+      genreId
+    }
+  }
+`;
