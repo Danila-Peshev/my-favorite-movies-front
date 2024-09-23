@@ -16,11 +16,11 @@ const useUserMovies = (): {
     notifyOnNetworkStatusChange: true,
   });
 
-  const userMovies = userMoviesData?.getUserMovies.map(
+  const userMovies = (userMoviesData.getUserMovies || []).map(
     (movie: { movieId: number }) => movie.movieId
   );
 
-  const watchedUserMovies = userMoviesData?.getUserMovies
+  const watchedUserMovies = (userMoviesData.getUserMovies || [])
     .filter((movie: { isWatched: boolean }) => movie.isWatched)
     .map((movie: { movieId: number }) => movie.movieId);
 

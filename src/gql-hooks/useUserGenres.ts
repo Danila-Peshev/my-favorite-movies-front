@@ -15,7 +15,7 @@ const useUserGenres = (): {
     notifyOnNetworkStatusChange: true,
   });
 
-  const userGenres = userGenresData?.getUserGenres.map(
+  const userGenres = (userGenresData.getUserGenres || []).map(
     (genre: { genreId: number }) => genre.genreId
   );
 
