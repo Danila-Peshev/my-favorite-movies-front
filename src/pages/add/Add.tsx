@@ -46,13 +46,11 @@ const Add = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
-  const { toggleUserMovie, errorToggleUserMovie } = useToggleUserMovie();
-  const { userGenres, isLoadingUserGenres, errorUserGenres } = useUserGenres();
+  const { toggleUserMovie } = useToggleUserMovie();
+  const { userGenres, isLoadingUserGenres } = useUserGenres();
   const {
     watchedUserMovies,
     isLoadingUserMovies,
-    errorUserMovies,
-    refetchUserMovies,
   } = useUserMovies();
 
   const totalPages = Math.min(moviesResponse.totalPages, MAX_TOTAL_PAGES);
@@ -105,7 +103,7 @@ const Add = () => {
   };
 
   useEffect(() => {
-    if (userGenres && !errorUserGenres) {
+    if (userGenres) {
       setFilters((prevFilters) => ({
         ...prevFilters,
         genresId: userGenres,
@@ -122,15 +120,10 @@ const Add = () => {
     fetchMovies();
   }, [page, filters.genresId, filters.releaseYear]);
 
-  if (errorUserGenres || errorUserMovies || errorToggleUserMovie) {
-    logout();
-  }
-
   if (!user) return null;
 
   const handleSaveMovieToggle = async (movieId: number) => {
     await toggleUserMovie({ variables: { movieId } });
-    refetchUserMovies();
     fetchMovies();
   };
 

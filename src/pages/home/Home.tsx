@@ -32,24 +32,20 @@ const Home = () => {
   const [moviesResponse, setMoviesResponse] = useState<MoviesResponse>(
     defaultMoviesResponse
   );
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [page, setPage] = useState<number>(1);
   const { t } = useTranslation();
-  const { toggleUserGenre, errorToggleUserGenre } = useToggleUserGenre();
-  const { toggleUserMovie, errorToggleUserMovie } = useToggleUserMovie();
-  const { toggleWatchMovie, errorToggleWatchMovie } = useToggleWatchMovie();
+  const { toggleUserGenre } = useToggleUserGenre();
+  const { toggleUserMovie } = useToggleUserMovie();
+  const { toggleWatchMovie } = useToggleWatchMovie();
   const {
     userGenres,
     isLoadingUserGenres,
-    errorUserGenres,
-    refetchUserGenres,
   } = useUserGenres();
   const {
     userMovies,
     watchedUserMovies,
     isLoadingUserMovies,
-    errorUserMovies,
-    refetchUserMovies,
   } = useUserMovies();
 
   useEffect(() => {
@@ -59,17 +55,8 @@ const Home = () => {
 
   useEffect(() => {
     fetchMoviesResponse();
+    console.log("bass")
   }, [page, isLoadingUserMovies]);
-
-  if (
-    errorUserGenres ||
-    errorUserMovies ||
-    errorToggleUserGenre ||
-    errorToggleUserMovie ||
-    errorToggleWatchMovie
-  ) {
-    logout();
-  }
 
   if (!user) {
     return null;
@@ -77,17 +64,14 @@ const Home = () => {
 
   const handleClickWatched = async (movieId: number) => {
     await toggleWatchMovie({ variables: { movieId } });
-    refetchUserMovies();
   };
 
   const handleClickRemove = async (movieId: number) => {
     await toggleUserMovie({ variables: { movieId } });
-    refetchUserMovies();
   };
 
   const handleClickOnGenre = async (genreId: number) => {
     await toggleUserGenre({ variables: { genreId } });
-    refetchUserGenres();
   };
 
   const totalPages = Math.min(
@@ -96,7 +80,7 @@ const Home = () => {
   );
 
   async function fetchMoviesResponse() {
-    if (user && !isLoadingUserMovies) {
+    if (!isLoadingUserMovies) {
       const movies = await getFavoriteMoviesByIds({
         ids: userMovies,
         language,

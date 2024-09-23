@@ -5,13 +5,11 @@ const useUserMovies = (): {
   userMovies: number[];
   watchedUserMovies: number[];
   isLoadingUserMovies: boolean;
-  errorUserMovies: Error | null | undefined;
   refetchUserMovies: () => void;
 } => {
   const {
     data: userMoviesData,
     loading: isLoadingUserMovies,
-    error: errorUserMovies,
     refetch: refetchUserMovies,
   } = useQuery(GET_USER_MOVIES, {
     fetchPolicy: "cache-and-network",
@@ -30,7 +28,6 @@ const useUserMovies = (): {
     userMovies,
     watchedUserMovies,
     isLoadingUserMovies,
-    errorUserMovies,
     refetchUserMovies,
   };
 };
