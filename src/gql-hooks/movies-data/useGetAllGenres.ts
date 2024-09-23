@@ -20,7 +20,7 @@ const useGetAllGenres = (
     notifyOnNetworkStatusChange: true,
   });
 
-  const genres = dataGetAllGenres?.getAllGenres;
+  const genres = dataGetAllGenres?.getAllGenres || [];
 
   return {
     genres,
