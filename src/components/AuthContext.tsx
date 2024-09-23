@@ -6,8 +6,8 @@ import {
   useEffect,
 } from "react";
 import { User } from "../types/User";
-import useLogin from "../gql-hooks/useLogin";
-import useGetUser from "../gql-hooks/useGetUser";
+import useLogin from "../gql-hooks/user-data/useLogin";
+import useGetUser from "../gql-hooks/user-data/useGetUser";
 
 type AuthContextType = {
   user: User | null;

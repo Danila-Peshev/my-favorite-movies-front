@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../components/AuthContext";
-import { MoviesResponse } from "../../types/movie-api-types/MoviesResponse";
 import { useLanguage } from "../../components/switch-language/LanguageContext";
-import { getAllGenres, getMoviesByFilters } from "../../services/MovieService";
 import { ViewProvider } from "../home/movies-block/switch-view/ViewContext";
 import { useTranslation } from "react-i18next";
-import { Genre } from "../../types/movie-api-types/Genre";
 import GenresBlock from "../home/GenresBlock";
 import MoviesBlock from "../home/movies-block/MoviesBlock";
 import PaginationBlock from "../home/movies-block/PaginationBlock";
@@ -16,16 +12,11 @@ import {
   AVAILABLE_YEARS,
   MAX_RELEASE_YEAR,
 } from "../../constants/filter_constants";
-import useToggleUserMovie from "../../gql-hooks/useToggleUserMovie";
-import useUserGenres from "../../gql-hooks/useUserGenres";
-import useUserMovies from "../../gql-hooks/useUserMovies";
-
-const defaultMoviesResponse: MoviesResponse = {
-  page: 1,
-  results: [],
-  totalPages: 1,
-  totalResult: 0,
-};
+import useToggleUserMovie from "../../gql-hooks/user-data/useToggleUserMovie";
+import useUserGenres from "../../gql-hooks/user-data/useUserGenres";
+import useUserMovies from "../../gql-hooks/user-data/useUserMovies";
+import useGetAllGenres from "../../gql-hooks/movies-data/useGetAllGenres";
+import useGetMoviesByFilters from "../../gql-hooks/movies-data/useGetMoviesByFilters";
 
 type FiltersType = {
   genresId: number[];
@@ -34,7 +25,6 @@ type FiltersType = {
 };
 
 const Add = () => {
-  const { user, logout } = useAuth();
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [filters, setFilters] = useState<FiltersType>({
@@ -42,18 +32,25 @@ const Add = () => {
     popularity: 0,
     releaseYear: MAX_RELEASE_YEAR,
   });
-  const [moviesResponse, setMoviesResponse] = useState(defaultMoviesResponse);
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
   const { toggleUserMovie } = useToggleUserMovie();
   const { userGenres, isLoadingUserGenres } = useUserGenres();
-  const {
-    watchedUserMovies,
-    isLoadingUserMovies,
-  } = useUserMovies();
+  const { watchedUserMovies, isLoadingUserMovies } = useUserMovies();
+  const { genres, isLoadingGetAllGenres, refetchAllGenres } =
+    useGetAllGenres(language);
+  const { moviesResponse, isLoadingMoviesByFilters, refetchMoviesByFilters } =
+    useGetMoviesByFilters(
+      language,
+      filters.genresId,
+      filters.popularity,
+      filters.releaseYear,
+      page
+    );
 
-  const totalPages = Math.min(moviesResponse.totalPages, MAX_TOTAL_PAGES);
+  const totalPages = Math.min(
+    moviesResponse ? moviesResponse.totalPages : 1,
+    MAX_TOTAL_PAGES
+  );
 
   const handleGenreToggle = (genreId: number) => {
     setFilters((prevFilters) => ({
@@ -72,36 +69,6 @@ const Add = () => {
     setFilters((prevFilters) => ({ ...prevFilters, releaseYear }));
   };
 
-  const fetchGenres = async () => {
-    setIsLoading(true);
-    try {
-      const fetchedGenres = await getAllGenres(language);
-      setGenres(fetchedGenres);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchMovies = async () => {
-    setIsLoading(true);
-    try {
-      if (user) {
-        const movies = await getMoviesByFilters({
-          language,
-          page,
-          genreIds: filters.genresId,
-          releaseYear: filters.releaseYear,
-          minCountVotes: filters.popularity,
-        });
-        setMoviesResponse(movies);
-      } else {
-        setMoviesResponse(defaultMoviesResponse);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (userGenres) {
       setFilters((prevFilters) => ({
@@ -112,59 +79,59 @@ const Add = () => {
   }, [isLoadingUserGenres]);
 
   useEffect(() => {
-    fetchGenres();
-    fetchMovies();
+    refetchAllGenres();
+    refetchMoviesByFilters();
   }, [language]);
 
   useEffect(() => {
-    fetchMovies();
+    refetchMoviesByFilters();
   }, [page, filters.genresId, filters.releaseYear]);
-
-  if (!user) return null;
 
   const handleSaveMovieToggle = async (movieId: number) => {
     await toggleUserMovie({ variables: { movieId } });
-    fetchMovies();
   };
 
   return (
     <ViewProvider>
       <div className="w-11/12 flex flex-col gap-y-5 p-5 mx-auto mt-24 mb-12 text-white text-base font-medium bg-gray-900 rounded">
-        <GenresBlock
-          selectedGenres={filters.genresId}
-          clickOnGenre={handleGenreToggle}
-          genres={genres}
-        />
-        <span>
-          {t("popularity")}: {filters.popularity}
-        </span>
-        <input
-          type="range"
-          min={MIN_POPULARITY}
-          max={MAX_POPULARITY}
-          step={1}
-          onChange={(e) => handleRangeChange(Number(e.target.value))}
-          onMouseUp={fetchMovies}
-          onTouchEnd={fetchMovies}
-        />
-        <span>
-          {t("releaseYear")}: {filters.releaseYear}
-        </span>
-        <select
-          value={filters.releaseYear}
-          onChange={(e) => handleYearChange(Number(e.target.value))}
-          className="p-2 border rounded bg-slate-800"
-        >
-          {AVAILABLE_YEARS.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
-        {isLoadingUserGenres || isLoadingUserMovies || isLoading ? (
+        {isLoadingUserGenres ||
+        isLoadingUserMovies ||
+        isLoadingGetAllGenres ||
+        isLoadingMoviesByFilters ? (
           t("loading")
         ) : (
           <>
+            <GenresBlock
+              selectedGenres={filters.genresId}
+              clickOnGenre={handleGenreToggle}
+              genres={genres}
+            />
+            <span>
+              {t("popularity")}: {filters.popularity}
+            </span>
+            <input
+              type="range"
+              min={MIN_POPULARITY}
+              max={MAX_POPULARITY}
+              step={1}
+              onChange={(e) => handleRangeChange(Number(e.target.value))}
+              onMouseUp={() => refetchMoviesByFilters()}
+              onTouchEnd={() => refetchMoviesByFilters()}
+            />
+            <span>
+              {t("releaseYear")}: {filters.releaseYear}
+            </span>
+            <select
+              value={filters.releaseYear}
+              onChange={(e) => handleYearChange(Number(e.target.value))}
+              className="p-2 border rounded bg-slate-800"
+            >
+              {AVAILABLE_YEARS.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
             <MoviesBlock
               genres={genres}
               page={moviesResponse.page}
