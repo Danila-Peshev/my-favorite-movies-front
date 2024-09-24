@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { SimpleMovie } from "../../../types/movie-api-types/SimpleMovie";
 import OneMovie from "./OneMovie";
 import { Link } from "react-router-dom";
-import useUserMovies from "../../../gql-hooks/useUserMovies";
+import useUserMovies from "../../../gql-hooks/user-data/useUserMovies";
 
 interface MoviesBlockProps {
   genres: Genre[];

@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { GET_USER_MOVIES } from "../queries-mutations/queries";
+import { GET_USER_MOVIES } from "../../queries-mutations/queries";
 
 const useUserMovies = (): {
   userMovies: number[];

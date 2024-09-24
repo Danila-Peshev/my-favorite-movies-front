@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { GET_USER } from "../queries-mutations/queries";
+import { GET_USER } from "../../queries-mutations/queries";
 
 const useGetUser = () => {
   const {
